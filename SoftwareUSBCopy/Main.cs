@@ -171,12 +171,12 @@ namespace SoftwareUSBCopy
         /// Gets the latest ECL revision of a software part number.
         /// </summary>
         /// <param name="softwarePartNumber"></param>
-        /// <param name="softwarePartOne"></param>
         /// <returns></returns>
-        private string getECL(string softwarePartNumber, string softwarePartOne)
+        private string getECL(string softwarePartNumber)
         {
             int dash;
             string tempECLStr;
+            string softwarePartOne = softwarePartNumber.Substring(4, 5);
 
             try
             {
@@ -284,13 +284,13 @@ namespace SoftwareUSBCopy
                 if (rbPitco.Checked)
                 {
                     softwareTopDir = VAULT_PATH + @"\240-91452-XX\240-91452-03";
-                    ECL = getECL("240-91452-03", "91452");
+                    ECL = getECL("240-91452-03");
                     softwarePartNumber = "Pitco 240-91452-03";
                 }
                 else if (rbVesta.Checked)
                 {
                     softwareTopDir = VAULT_PATH + @"\240-91452-XX\240-91452-02";
-                    ECL = getECL("240-91452-02", "91452");
+                    ECL = getECL("240-91452-02");
                     softwarePartNumber = "Vesta 240-91452-02";
                 }
 
