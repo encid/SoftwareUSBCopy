@@ -1,11 +1,18 @@
-﻿using System;
+﻿/* 
+ * 
+ * Software USB Copy
+ * Designed by R. Cavallaro
+ * Last update: 5/23/17
+ * 
+ */
+
+using System;
 using Microsoft.VisualBasic.FileIO;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using System.Configuration;
 using System.ComponentModel;
 
 namespace SoftwareUSBCopy
@@ -13,77 +20,102 @@ namespace SoftwareUSBCopy
     public partial class Main : Form
     {
         public const string VAULT_PATH = @"\\pandora\vault\Released_Part_Information\240-XXXXX-XX_SOFTWARE\240-9XXXX-XX\240-91XXX-XX";
+        public const string CALIBRATION_FILE = @"\\ares\shared\Operations\Test Engineering\Test Softwares\Software USB Copy\FastFsUpdate.tar.gz";
+        public const string FORCE_UPDATE_FILE = @"\\ares\shared\Operations\Test Engineering\Test Softwares\Software USB Copy\force_update.txt";
         int currDriveCount;
         BackgroundWorker bw;
 
         private struct CopyParams
         {
-            public readonly string _sourceDir;
-            public readonly List<string> _destDirs;
-            public CopyParams(string source, List<string> destinations)
+            public readonly string source;
+            public readonly List<string> dest;
+            public readonly string swpn;
+            public readonly string ecl;
+            public CopyParams(string _source, List<string> _destinations, string _swpn, string _ecl)
             {
-                _sourceDir = source;
-                _destDirs = destinations;
+                ecl = _ecl;
+                swpn = _swpn;
+                source = _source;
+                dest = _destinations;
             }
         }
 
         private struct ProgressParams
         {
-            public int _currentDrive;
-            public readonly int _totalDrives;
-            public ProgressParams(int currentDrive, int totalDrives)
+            public int currentDrive;
+            public readonly int totalDrives;
+            public ProgressParams(int _currentDrive, int _totalDrives)
             {
-                _currentDrive = currentDrive;
-                _totalDrives = totalDrives;
+                currentDrive = _currentDrive;
+                totalDrives = _totalDrives;
             }
         }
 
         public Main()
         {
             InitializeComponent();
+            InitializeEventHandlers();
 
             // Add (destination) removable drives to ListView
             PopulateListView(lvDrives);
 
             currDriveCount = lvDrives.Items.Count;
+                        
+            rbPitco.Checked = true;
+        }
 
+        public void InitializeEventHandlers()
+        {
             // Tick the checkbox if any part of the item line in ListView is clicked
-            //lvDrives.MouseClick += (o, e) =>
-            //{
-            //    var lvi = lvDrives.GetItemAt(e.X, e.Y);
-            //    if (e.X > 16) lvi.Checked = !lvi.Checked;
-            //};
+            lvDrives.MouseClick += (s, e) => 
+            {
+                var lvi = lvDrives.GetItemAt(e.X, e.Y);
+                if (e.X > 16) lvi.Checked = !lvi.Checked;
+            };
 
             // Add columns to the ListView
             lvDrives.Columns.Add("Drive", -2, HorizontalAlignment.Left);
-            lvDrives.Columns.Add("Volume Name", -2, HorizontalAlignment.Left);
+            lvDrives.Columns.Add("Volume Name", 110, HorizontalAlignment.Left);
             lvDrives.Columns.Add("File System", -2, HorizontalAlignment.Left);
             lvDrives.Columns.Add("Capacity", -2, HorizontalAlignment.Left);
             lvDrives.Columns.Add("Free Space", -2, HorizontalAlignment.Left);
 
+            // Disallow changing width on ListView columns
+            lvDrives.ColumnWidthChanging += (s, e) =>
+            {
+                e.NewWidth = this.lvDrives.Columns[e.ColumnIndex].Width;
+                e.Cancel = true;
+            };
+
             // Set up BackgroundWorker
             bw = new BackgroundWorker
             {
-                WorkerReportsProgress = true,
                 WorkerSupportsCancellation = true
             };
-            //bw.DoWork += bw_DoWork;
-            //bw.ProgressChanged += bw_ProgressChanged;
-            //bw.RunWorkerCompleted += bw_RunWorkerCompleted;
+            bw.DoWork += bw_DoWork;
+            bw.RunWorkerCompleted += bw_RunWorkerCompleted;
 
             // Make sure textbox stays at the most recent line(bottom most)
-            rt.TextChanged += (sender, e) => {
+            rt.TextChanged += (s, e) => 
+            {
                 if (rt.Visible)
                     rt.ScrollToCaret();
             };
         }
 
-        private List<string> GetDestinationDirs(ListView lview)
+        /// <summary>
+        /// Gets a list of checked items (drive letters as string) from the specified ListView control.
+        /// </summary>
+        /// <param name="lView"></param>
+        /// <returns></returns>
+        private List<string> GetDestinationDirs(ListView lView)
         {
             var d = new List<string>();
 
-            foreach (ListViewItem item in lview.CheckedItems)
+            foreach (ListViewItem item in lView.CheckedItems)
+            {
                 d.Add(item.Text);
+            }
 
             return d;
         }
@@ -132,20 +164,53 @@ namespace SoftwareUSBCopy
         /// <returns></returns>
         private IEnumerable<DriveInfo> GetRemovableDrives()
         {
-            var drives = DriveInfo.GetDrives();
+            return DriveInfo.GetDrives().Where(p => p.DriveType == DriveType.Removable && p.IsReady);
+        }
 
-            return drives.Where(p => p.DriveType == DriveType.Removable && p.IsReady);
+        /// <summary>
+        /// Gets the latest ECL revision of a software part number.
+        /// </summary>
+        /// <param name="softwarePartNumber"></param>
+        /// <param name="softwarePartOne"></param>
+        /// <returns></returns>
+        private string getECL(string softwarePartNumber, string softwarePartOne)
+        {
+            int dash;
+            string tempECLStr;
+
+            try
+            {
+                var softwareDir = (from sd in Directory.GetDirectories(string.Format(@"{0}\240-{1}-XX\", VAULT_PATH, softwarePartOne))
+                                   where sd.Contains(softwarePartNumber)
+                                   select sd)
+                                  .FirstOrDefault();
+
+                var eclDir = (from ed in Directory.GetDirectories(softwareDir)
+                              where ed.Contains("ECL")
+                              select ed)
+                             .FirstOrDefault();
+
+                tempECLStr = eclDir.Substring(eclDir.Length - 6);
+                dash = tempECLStr.IndexOf("-", StringComparison.CurrentCulture);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+                return string.Empty;
+            }
+
+            return tempECLStr.Substring(dash + 1);
         }
 
         /// <summary>
         /// Detects removable drives and adds them to ListView.
         /// </summary>
-        /// <param name="lview">ListView to populate.</param>
-        private void PopulateListView(ListView lview)
+        /// <param name="lView">ListView to populate.</param>
+        private void PopulateListView(ListView lView)
         {
             Logger.Log("Scanning for removable drives...", rt);
 
-            lview.Items.Clear();
+            lView.Items.Clear();
 
             var drives = GetRemovableDrives();
 
@@ -171,7 +236,7 @@ namespace SoftwareUSBCopy
                 oItem.SubItems.Add(totalSpace);
                 oItem.SubItems.Add(freeSpace);
 
-                lview.Items.Add(oItem);
+                lView.Items.Add(oItem);
             }
 
             // Get count and names of drives found and log it to status
@@ -187,9 +252,8 @@ namespace SoftwareUSBCopy
         /// <param name="destDirs">Destination directories in list collection.</param>
         private void ValidateCopyParams(string srcDir, List<string> destDirs)
         {
-            // Check if source drive is ready and exists
-            var dInfo = new DriveInfo(srcDir.Substring(0, 2));
-            if (!dInfo.IsReady)
+            // Check if source path exists
+            if (!Directory.Exists(srcDir))
                 throw new Exception("Source drive is not ready. Please try again.");
 
             // If no drives are checked in CheckedListBox, exit method 
@@ -206,32 +270,40 @@ namespace SoftwareUSBCopy
                     throw new Exception("Target destination drive does not exist. Please try again.");
             }
         }
-
-
+        
         private void btnStartCopy_click(object sender, EventArgs e)
         {
-            string softwareDir = "";
-            // Set software directory based on what touchscreen version is selected
-            if (rbPitco.Checked)
-            {
-                softwareDir = VAULT_PATH + @"\240-91452-XX\240-91452-03";
-            }
-            
-
+            string softwareTopDir = "";
+            var ECL = "";
+            var softwarePartNumber = "";
             PictureBox1.Visible = false;
-
-            var cp = new CopyParams(softwareDir, GetDestinationDirs(lvDrives));
 
             try
             {
+                // Get software dir based on what touchscreen version is selected, get ECL, and get full software dir
+                if (rbPitco.Checked)
+                {
+                    softwareTopDir = VAULT_PATH + @"\240-91452-XX\240-91452-03";
+                    ECL = getECL("240-91452-03", "91452");
+                    softwarePartNumber = "Pitco 240-91452-03";
+                }
+                else if (rbVesta.Checked)
+                {
+                    softwareTopDir = VAULT_PATH + @"\240-91452-XX\240-91452-02";
+                    ECL = getECL("240-91452-02", "91452");
+                    softwarePartNumber = "Vesta 240-91452-02";
+                }
+
+                var softwareDir = string.Format(@"{0}\ECL-{1}", softwareTopDir, ECL);              
+                var cp = new CopyParams(softwareDir, GetDestinationDirs(lvDrives), softwarePartNumber, ECL);
+
                 // Validate user input on UI
-                ValidateCopyParams(cp._sourceDir, cp._destDirs);
+                ValidateCopyParams(cp.source, cp.dest);
 
                 // No exceptions, so continue....
-                // Disable UI controls and set status
+                // Disable UI controls
                 DisableUI();
-                lblStatus.Text = "Copying...";
-                var logStr = string.Format("Starting to copy '{0}' to {1} {2}...", cp._sourceDir, cp._destDirs.Count, "drive".Pluralize(cp._destDirs.Count));
+                var logStr = string.Format("Starting to copy {0} ECL-{1}...", softwarePartNumber, ECL);
                 Logger.Log(logStr, rt);
 
                 // Begin the copy in BackgroundWorker, pass CopyParams object into it
@@ -241,7 +313,6 @@ namespace SoftwareUSBCopy
             {
                 var logStr = string.Format("Error: {0}", ex.Message);
                 Logger.Log(logStr, rt, Color.Red);
-                //MessageBox.Show("Error:  " + ex.Message, "USB Batch Copy", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 if (ex.Message.Contains("Target destination drive does not exist"))
                     PopulateListView(lvDrives);
             }
@@ -252,8 +323,8 @@ namespace SoftwareUSBCopy
             var cp = (CopyParams)e.Argument;
 
             try
-            {
-                PerformCopy(cp._sourceDir, cp._destDirs);
+            {                
+                PerformCopy(cp.source, cp.dest, cp.swpn, cp.ecl);                
             }
             catch (ArgumentException)
             {  // Catch user removal of drive during copy for RunWorkerCompleted to process
@@ -264,21 +335,12 @@ namespace SoftwareUSBCopy
             }
         }
 
-        private void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            var pp = (ProgressParams)e.UserState;
-
-            var logStr = string.Format("Copying drive {0} of {1}..", pp._currentDrive, pp._totalDrives);
-            Logger.Log(logStr, rt);
-
-        }
-
         private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Cancelled)
             {
                 // The user cancelled the operation.
-                lblStatus.Text = "Ready";
+                //lblStatus.Text = "Ready";
                 Logger.Log("Copy operation has been cancelled", rt, Color.Red);
                 this.BringToFront();
                 this.Focus();
@@ -286,11 +348,11 @@ namespace SoftwareUSBCopy
             else if (e.Error != null)
             {
                 // There was an error during the operation.
-                lblStatus.Text = "Ready";
+                //lblStatus.Text = "Ready";
                 PopulateListView(lvDrives);
                 var logStr = string.Format("An error has occured: {0}", e.Error.Message);
                 Logger.Log(logStr, rt, Color.Red);
-                MessageBox.Show("An error has occured: " + e.Error.Message, "USB Batch Copy", MessageBoxButtons.OK);
+                MessageBox.Show("An error has occured: " + e.Error.Message, "Software USB Copy", MessageBoxButtons.OK);
                 this.BringToFront();
                 this.Focus();
             }
@@ -298,29 +360,34 @@ namespace SoftwareUSBCopy
             {
                 // The operation completed normally.
                 PictureBox1.Visible = true;
-                lblStatus.Text = "Ready";
-                var logStr = string.Format("Copy operation successful -- copied to {0} {1}", GetDestinationDirs(lvDrives).Count(),
-                                                                            "drive".Pluralize(GetDestinationDirs(lvDrives).Count));
+                //lblStatus.Text = "Ready";
+                var logStr = "Copy operation successful!";
                 Logger.Log(logStr, rt, Color.Green);
             }
 
             // Enable UI controls            
             EnableUI();
+            PopulateListView(lvDrives);
 
-            SetListViewCheckState(lvDrives, false);
+            //SetListViewCheckState(lvDrives, false);
         }
 
-        private void PerformCopy(string srcDir, List<string> destDirs)
+        /// <summary>
+        /// Begins a copy operation.
+        /// </summary>
+        /// <param name="srcDir"></param>
+        /// <param name="destDirs"></param>
+        private void PerformCopy(string srcDir, List<string> destDirs, string softwarePartNumber, string ECL)
         {
-            var pp = new ProgressParams(0, destDirs.Count);
-
             // Start copy execution
             for (int i = 0; i < destDirs.Count; i++)
             {
-                pp._currentDrive++;
-                bw.ReportProgress(i, pp);
-                string destDir = destDirs[i];
-                FileSystem.CopyDirectory(srcDir, destDir, UIOption.AllDialogs, UICancelOption.ThrowException);
+                var dInfo = new DriveInfo(destDirs[i].Substring(0, 1));
+                dInfo.VolumeLabel = string.Format("{0} {1}", softwarePartNumber.Substring(10, 8), ECL);
+                ClearFolder(destDirs[i]);
+                FileSystem.CopyDirectory(srcDir, destDirs[i], UIOption.AllDialogs, UICancelOption.ThrowException);
+                FileSystem.CopyFile(CALIBRATION_FILE, destDirs[i] + @"\FastFsUpdate.tar.gz", UIOption.AllDialogs, UICancelOption.ThrowException);
+                FileSystem.CopyFile(FORCE_UPDATE_FILE, destDirs[i] + @"\force_update.txt", UIOption.AllDialogs, UICancelOption.ThrowException);
             }
         }
 
@@ -348,6 +415,24 @@ namespace SoftwareUSBCopy
             btnStartCopy.Enabled = false;
             lvDrives.Enabled = false;
             tmrRefresh.Enabled = false;
+        }
+
+        /// <summary>
+        /// Deletes all files and directories in a path, with no warning messages.
+        /// </summary>
+        /// <param name="path"></param>
+        private void ClearFolder(string path)
+        {
+            DirectoryInfo dir = new DirectoryInfo(path);
+
+            foreach (FileInfo fi in dir.GetFiles())            
+                fi.Delete();
+            
+            foreach (DirectoryInfo di in dir.GetDirectories())
+            {
+                ClearFolder(di.FullName);
+                di.Delete();
+            }
         }
 
         /// <summary>

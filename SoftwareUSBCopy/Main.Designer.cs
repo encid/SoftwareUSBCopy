@@ -39,27 +39,37 @@
             this.tmrRefresh = new System.Windows.Forms.Timer(this.components);
             this.PictureBox1 = new System.Windows.Forms.PictureBox();
             this.lblStatus = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.lblPitcoSWPN = new System.Windows.Forms.Label();
+            this.lblVestaSWPN = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox1)).BeginInit();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // lvDrives
             // 
+            this.lvDrives.BackColor = System.Drawing.Color.White;
+            this.lvDrives.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lvDrives.CheckBoxes = true;
             this.lvDrives.FullRowSelect = true;
-            this.lvDrives.Location = new System.Drawing.Point(43, 23);
+            this.lvDrives.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.lvDrives.Location = new System.Drawing.Point(15, 25);
+            this.lvDrives.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.lvDrives.MultiSelect = false;
             this.lvDrives.Name = "lvDrives";
             this.lvDrives.ShowGroups = false;
-            this.lvDrives.Size = new System.Drawing.Size(365, 131);
+            this.lvDrives.Size = new System.Drawing.Size(425, 119);
             this.lvDrives.TabIndex = 0;
             this.lvDrives.UseCompatibleStateImageBehavior = false;
             this.lvDrives.View = System.Windows.Forms.View.Details;
             // 
             // btnStartCopy
             // 
-            this.btnStartCopy.Location = new System.Drawing.Point(463, 277);
+            this.btnStartCopy.Location = new System.Drawing.Point(524, 183);
+            this.btnStartCopy.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnStartCopy.Name = "btnStartCopy";
-            this.btnStartCopy.Size = new System.Drawing.Size(92, 23);
+            this.btnStartCopy.Size = new System.Drawing.Size(123, 27);
             this.btnStartCopy.TabIndex = 1;
             this.btnStartCopy.Text = "Copy Software";
             this.btnStartCopy.UseVisualStyleBackColor = true;
@@ -67,19 +77,28 @@
             // 
             // rt
             // 
-            this.rt.Location = new System.Drawing.Point(43, 277);
+            this.rt.BackColor = System.Drawing.Color.White;
+            this.rt.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rt.Location = new System.Drawing.Point(27, 203);
+            this.rt.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.rt.Name = "rt";
-            this.rt.Size = new System.Drawing.Size(365, 96);
+            this.rt.ReadOnly = true;
+            this.rt.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            this.rt.Size = new System.Drawing.Size(425, 145);
             this.rt.TabIndex = 2;
             this.rt.Text = "";
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.lblVestaSWPN);
+            this.groupBox1.Controls.Add(this.lblPitcoSWPN);
             this.groupBox1.Controls.Add(this.rbVesta);
             this.groupBox1.Controls.Add(this.rbPitco);
-            this.groupBox1.Location = new System.Drawing.Point(449, 23);
+            this.groupBox1.Location = new System.Drawing.Point(489, 12);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(211, 131);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.groupBox1.Size = new System.Drawing.Size(198, 159);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Touchscreen Part Number";
@@ -87,9 +106,11 @@
             // rbVesta
             // 
             this.rbVesta.AutoSize = true;
-            this.rbVesta.Location = new System.Drawing.Point(14, 51);
+            this.rbVesta.Enabled = false;
+            this.rbVesta.Location = new System.Drawing.Point(12, 79);
+            this.rbVesta.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.rbVesta.Name = "rbVesta";
-            this.rbVesta.Size = new System.Drawing.Size(127, 17);
+            this.rbVesta.Size = new System.Drawing.Size(150, 21);
             this.rbVesta.TabIndex = 1;
             this.rbVesta.TabStop = true;
             this.rbVesta.Text = "231-60295-70 (Vesta)";
@@ -98,9 +119,10 @@
             // rbPitco
             // 
             this.rbPitco.AutoSize = true;
-            this.rbPitco.Location = new System.Drawing.Point(14, 28);
+            this.rbPitco.Location = new System.Drawing.Point(12, 26);
+            this.rbPitco.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.rbPitco.Name = "rbPitco";
-            this.rbPitco.Size = new System.Drawing.Size(124, 17);
+            this.rbPitco.Size = new System.Drawing.Size(146, 21);
             this.rbPitco.TabIndex = 0;
             this.rbPitco.TabStop = true;
             this.rbPitco.Text = "231-60295-60 (Pitco)";
@@ -116,9 +138,10 @@
             // 
             this.PictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.PictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("PictureBox1.Image")));
-            this.PictureBox1.Location = new System.Drawing.Point(463, 313);
+            this.PictureBox1.Location = new System.Drawing.Point(524, 245);
+            this.PictureBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.PictureBox1.Name = "PictureBox1";
-            this.PictureBox1.Size = new System.Drawing.Size(79, 74);
+            this.PictureBox1.Size = new System.Drawing.Size(123, 103);
             this.PictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.PictureBox1.TabIndex = 4;
             this.PictureBox1.TabStop = false;
@@ -127,28 +150,65 @@
             // lblStatus
             // 
             this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(135, 215);
+            this.lblStatus.Location = new System.Drawing.Point(24, 183);
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(35, 13);
+            this.lblStatus.Size = new System.Drawing.Size(43, 17);
             this.lblStatus.TabIndex = 5;
-            this.lblStatus.Text = "label1";
+            this.lblStatus.Text = "Status";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.lvDrives);
+            this.groupBox2.Location = new System.Drawing.Point(12, 12);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(453, 160);
+            this.groupBox2.TabIndex = 6;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Destination Drive";
+            // 
+            // lblPitcoSWPN
+            // 
+            this.lblPitcoSWPN.AutoSize = true;
+            this.lblPitcoSWPN.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPitcoSWPN.Location = new System.Drawing.Point(32, 44);
+            this.lblPitcoSWPN.Name = "lblPitcoSWPN";
+            this.lblPitcoSWPN.Size = new System.Drawing.Size(102, 15);
+            this.lblPitcoSWPN.TabIndex = 2;
+            this.lblPitcoSWPN.Text = "s/w: 240-91452-03";
+            // 
+            // lblVestaSWPN
+            // 
+            this.lblVestaSWPN.AutoSize = true;
+            this.lblVestaSWPN.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblVestaSWPN.Location = new System.Drawing.Point(32, 97);
+            this.lblVestaSWPN.Name = "lblVestaSWPN";
+            this.lblVestaSWPN.Size = new System.Drawing.Size(102, 15);
+            this.lblVestaSWPN.TabIndex = 3;
+            this.lblVestaSWPN.Text = "s/w: 240-91452-02";
             // 
             // Main
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(701, 399);
+            this.ClientSize = new System.Drawing.Size(700, 368);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.PictureBox1);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.rt);
             this.Controls.Add(this.btnStartCopy);
-            this.Controls.Add(this.lvDrives);
+            this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.MaximizeBox = false;
             this.Name = "Main";
-            this.Text = "Form1";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Software USB Copy";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox1)).EndInit();
+            this.groupBox2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -165,6 +225,9 @@
         private System.Windows.Forms.Timer tmrRefresh;
         private System.Windows.Forms.PictureBox PictureBox1;
         private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Label lblVestaSWPN;
+        private System.Windows.Forms.Label lblPitcoSWPN;
     }
 }
 
