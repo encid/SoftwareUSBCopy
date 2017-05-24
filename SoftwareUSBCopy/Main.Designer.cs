@@ -1,4 +1,4 @@
-﻿namespace SoftwareUSBCopy
+﻿namespace USBSoftwareLoader
 {
     partial class Main
     {
@@ -28,20 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.lvDrives = new System.Windows.Forms.ListView();
             this.btnStartCopy = new System.Windows.Forms.Button();
             this.rt = new System.Windows.Forms.RichTextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.lblVestaSWPN = new System.Windows.Forms.Label();
+            this.lblPitcoSWPN = new System.Windows.Forms.Label();
             this.rbVesta = new System.Windows.Forms.RadioButton();
             this.rbPitco = new System.Windows.Forms.RadioButton();
-            this.tmrRefresh = new System.Windows.Forms.Timer(this.components);
             this.PictureBox1 = new System.Windows.Forms.PictureBox();
             this.lblStatus = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.lblPitcoSWPN = new System.Windows.Forms.Label();
-            this.lblVestaSWPN = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox1)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -103,6 +101,26 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Touchscreen Part Number";
             // 
+            // lblVestaSWPN
+            // 
+            this.lblVestaSWPN.AutoSize = true;
+            this.lblVestaSWPN.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblVestaSWPN.Location = new System.Drawing.Point(32, 97);
+            this.lblVestaSWPN.Name = "lblVestaSWPN";
+            this.lblVestaSWPN.Size = new System.Drawing.Size(102, 15);
+            this.lblVestaSWPN.TabIndex = 3;
+            this.lblVestaSWPN.Text = "s/w: 240-91452-02";
+            // 
+            // lblPitcoSWPN
+            // 
+            this.lblPitcoSWPN.AutoSize = true;
+            this.lblPitcoSWPN.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPitcoSWPN.Location = new System.Drawing.Point(32, 44);
+            this.lblPitcoSWPN.Name = "lblPitcoSWPN";
+            this.lblPitcoSWPN.Size = new System.Drawing.Size(102, 15);
+            this.lblPitcoSWPN.TabIndex = 2;
+            this.lblPitcoSWPN.Text = "s/w: 240-91452-03";
+            // 
             // rbVesta
             // 
             this.rbVesta.AutoSize = true;
@@ -128,16 +146,10 @@
             this.rbPitco.Text = "231-60295-60 (Pitco)";
             this.rbPitco.UseVisualStyleBackColor = true;
             // 
-            // tmrRefresh
-            // 
-            this.tmrRefresh.Enabled = true;
-            this.tmrRefresh.Interval = 750;
-            this.tmrRefresh.Tick += new System.EventHandler(this.tmrRefresh_Tick);
-            // 
             // PictureBox1
             // 
             this.PictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.PictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("PictureBox1.Image")));
+            this.PictureBox1.Image = global::USBSoftwareLoader.Properties.Resources.checkmarkgreen;
             this.PictureBox1.Location = new System.Drawing.Point(524, 245);
             this.PictureBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.PictureBox1.Name = "PictureBox1";
@@ -166,26 +178,6 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Destination Drive";
             // 
-            // lblPitcoSWPN
-            // 
-            this.lblPitcoSWPN.AutoSize = true;
-            this.lblPitcoSWPN.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPitcoSWPN.Location = new System.Drawing.Point(32, 44);
-            this.lblPitcoSWPN.Name = "lblPitcoSWPN";
-            this.lblPitcoSWPN.Size = new System.Drawing.Size(102, 15);
-            this.lblPitcoSWPN.TabIndex = 2;
-            this.lblPitcoSWPN.Text = "s/w: 240-91452-03";
-            // 
-            // lblVestaSWPN
-            // 
-            this.lblVestaSWPN.AutoSize = true;
-            this.lblVestaSWPN.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblVestaSWPN.Location = new System.Drawing.Point(32, 97);
-            this.lblVestaSWPN.Name = "lblVestaSWPN";
-            this.lblVestaSWPN.Size = new System.Drawing.Size(102, 15);
-            this.lblVestaSWPN.TabIndex = 3;
-            this.lblVestaSWPN.Text = "s/w: 240-91452-02";
-            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
@@ -199,12 +191,13 @@
             this.Controls.Add(this.btnStartCopy);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MaximizeBox = false;
             this.Name = "Main";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Software USB Copy";
+            this.Text = "Kitchen Brains USB Software Loader";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox1)).EndInit();
@@ -222,7 +215,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton rbVesta;
         private System.Windows.Forms.RadioButton rbPitco;
-        private System.Windows.Forms.Timer tmrRefresh;
         private System.Windows.Forms.PictureBox PictureBox1;
         private System.Windows.Forms.Label lblStatus;
         private System.Windows.Forms.GroupBox groupBox2;

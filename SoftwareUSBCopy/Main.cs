@@ -1,8 +1,8 @@
 ﻿/* 
  * 
- * Software USB Copy
+ * USB Software Loader
  * Designed by R. Cavallaro
- * Last update: 5/23/17
+ * Last update: 5/24/17
  * 
  */
 
@@ -15,15 +15,16 @@ using System.Linq;
 using System.Windows.Forms;
 using System.ComponentModel;
 
-namespace SoftwareUSBCopy
+namespace USBSoftwareLoader
 {
     public partial class Main : Form
     {
         public const string VAULT_PATH = @"\\pandora\vault\Released_Part_Information\240-XXXXX-XX_SOFTWARE\240-9XXXX-XX\240-91XXX-XX";
-        public const string CALIBRATION_FILE = @"\\ares\shared\Operations\Test Engineering\Test Softwares\Software USB Copy\FastFsUpdate.tar.gz";
-        public const string FORCE_UPDATE_FILE = @"\\ares\shared\Operations\Test Engineering\Test Softwares\Software USB Copy\force_update.txt";
+        public const string CALIBRATION_FILE = @"\\ares\shared\Operations\Test Engineering\Test Softwares\USB Software Loader\FastFsUpdate.tar.gz";
+        public const string FORCE_UPDATE_FILE = @"\\ares\shared\Operations\Test Engineering\Test Softwares\USB Software Loader\force_update.txt";
         int currDriveCount;
         BackgroundWorker bw;
+        Timer tmrRefresh = new Timer();
 
         private struct CopyParams
         {
@@ -57,7 +58,7 @@ namespace SoftwareUSBCopy
             InitializeEventHandlers();
 
             // Add (destination) removable drives to ListView
-            PopulateListView(lvDrives);
+            PopulateListView(lvDrives, true);
 
             currDriveCount = lvDrives.Items.Count;
                         
@@ -66,8 +67,21 @@ namespace SoftwareUSBCopy
 
         public void InitializeEventHandlers()
         {
-            // Tick the checkbox if any part of the item line in ListView is clicked
-            lvDrives.MouseClick += (s, e) => 
+            // Initialize Timer
+            tmrRefresh.Enabled = true;
+            tmrRefresh.Interval = 750;
+            tmrRefresh.Tick += (s, e) =>
+            {
+                var drives = GetRemovableDrives();
+
+                if (drives.Count() != currDriveCount)
+                    PopulateListView(lvDrives, true);
+
+                currDriveCount = drives.Count();
+            };
+
+                // Tick the checkbox if any part of the item line in ListView is clicked
+                lvDrives.MouseClick += (s, e) => 
             {
                 var lvi = lvDrives.GetItemAt(e.X, e.Y);
                 if (e.X > 16) lvi.Checked = !lvi.Checked;
@@ -206,9 +220,11 @@ namespace SoftwareUSBCopy
         /// Detects removable drives and adds them to ListView.
         /// </summary>
         /// <param name="lView">ListView to populate.</param>
-        private void PopulateListView(ListView lView)
+        /// <param name="updateLog">Send update to status log.</param>
+        private void PopulateListView(ListView lView, bool updateLog)
         {
-            Logger.Log("Scanning for removable drives...", rt);
+            if (updateLog)            
+                Logger.Log("Scanning for removable drives...", rt);           
 
             lView.Items.Clear();
 
@@ -217,7 +233,8 @@ namespace SoftwareUSBCopy
             // If no removable drives detected, exit method
             if (!drives.Any())
             {
-                Logger.Log("No removable drives detected", rt);
+                if (updateLog)
+                    Logger.Log("No removable drives detected", rt);
                 return;
             }
 
@@ -241,8 +258,11 @@ namespace SoftwareUSBCopy
 
             // Get count and names of drives found and log it to status
             driveNames = driveNames.Substring(0, driveNames.Length - 2);
-            var logStr = string.Format("Detected {0} removable {1}: {2}", drives.Count(), "drive".Pluralize(drives.Count()), driveNames);
-            Logger.Log(logStr, rt);
+            if (updateLog)
+            {
+                var logStr = string.Format("Detected {0} removable {1}: {2}", drives.Count(), "drive".Pluralize(drives.Count()), driveNames);
+                Logger.Log(logStr, rt);
+            }
         }
 
         /// <summary>
@@ -301,6 +321,11 @@ namespace SoftwareUSBCopy
                 ValidateCopyParams(cp.source, cp.dest);
 
                 // No exceptions, so continue....
+                // Show warning that drive will be erased
+                if (MessageBox.Show(new Form() { TopMost = true }, "The selected USB drive will be erased!\nDo you wish to continue?",
+                    "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                    return;
+
                 // Disable UI controls
                 DisableUI();
                 var logStr = string.Format("Starting to copy {0} ECL-{1}...", softwarePartNumber, ECL);
@@ -314,7 +339,7 @@ namespace SoftwareUSBCopy
                 var logStr = string.Format("Error: {0}", ex.Message);
                 Logger.Log(logStr, rt, Color.Red);
                 if (ex.Message.Contains("Target destination drive does not exist"))
-                    PopulateListView(lvDrives);
+                    PopulateListView(lvDrives, false);
             }
         }
 
@@ -341,18 +366,17 @@ namespace SoftwareUSBCopy
             {
                 // The user cancelled the operation.
                 //lblStatus.Text = "Ready";
-                Logger.Log("Copy operation has been cancelled", rt, Color.Red);
+                Logger.Log("Software copying has been cancelled", rt, Color.Red);
                 this.BringToFront();
                 this.Focus();
             }
             else if (e.Error != null)
             {
-                // There was an error during the operation.
-                //lblStatus.Text = "Ready";
-                PopulateListView(lvDrives);
+                // There was an error during the operation
+                PopulateListView(lvDrives, false);
                 var logStr = string.Format("An error has occured: {0}", e.Error.Message);
                 Logger.Log(logStr, rt, Color.Red);
-                MessageBox.Show("An error has occured: " + e.Error.Message, "Software USB Copy", MessageBoxButtons.OK);
+                MessageBox.Show("An error has occured: " + e.Error.Message, "USB Software Loader", MessageBoxButtons.OK);
                 this.BringToFront();
                 this.Focus();
             }
@@ -360,16 +384,13 @@ namespace SoftwareUSBCopy
             {
                 // The operation completed normally.
                 PictureBox1.Visible = true;
-                //lblStatus.Text = "Ready";
-                var logStr = "Copy operation successful!";
+                var logStr = "Software loaded successfully!";
                 Logger.Log(logStr, rt, Color.Green);
             }
 
             // Enable UI controls            
             EnableUI();
-            PopulateListView(lvDrives);
-
-            //SetListViewCheckState(lvDrives, false);
+            PopulateListView(lvDrives, false);
         }
 
         /// <summary>
@@ -391,30 +412,16 @@ namespace SoftwareUSBCopy
             }
         }
 
-        private void tmrRefresh_Tick(object sender, EventArgs e)
-        {
-            var drives = GetRemovableDrives();
-
-            if (drives.Count() != currDriveCount)
-                PopulateListView(lvDrives);
-
-            currDriveCount = drives.Count();            
-        }
-
         private void EnableUI()
         {
-            // Enable UI controls                       
-            btnStartCopy.Enabled = true;
-            lvDrives.Enabled = true;
-            tmrRefresh.Enabled = true;
+            // Enable UI controls               
+            this.Enabled = true;
         }
 
         private void DisableUI()
         {
-            // Enable UI controls                        
-            btnStartCopy.Enabled = false;
-            lvDrives.Enabled = false;
-            tmrRefresh.Enabled = false;
+            // Enable UI controls    
+            this.Enabled = false;
         }
 
         /// <summary>

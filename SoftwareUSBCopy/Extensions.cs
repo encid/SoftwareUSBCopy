@@ -7,7 +7,7 @@ using System.Globalization;
 using System.Windows.Forms;
 using System.Drawing;
 
-namespace SoftwareUSBCopy
+namespace USBSoftwareLoader
 {
     public static class Extensions
     {

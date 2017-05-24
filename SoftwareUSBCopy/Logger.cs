@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace SoftwareUSBCopy
+namespace USBSoftwareLoader
 {
     public static class Logger
     {

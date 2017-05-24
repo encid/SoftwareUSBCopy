@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SoftwareUSBCopy.Properties {
+namespace USBSoftwareLoader.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace SoftwareUSBCopy.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SoftwareUSBCopy.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("USBSoftwareLoader.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,16 @@ namespace SoftwareUSBCopy.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap checkmarkgreen {
+            get {
+                object obj = ResourceManager.GetObject("checkmarkgreen", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }
