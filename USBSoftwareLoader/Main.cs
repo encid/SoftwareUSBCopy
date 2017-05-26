@@ -2,7 +2,7 @@
  * 
  * USB Software Loader
  * Designed by R. Cavallaro
- * Last update: 5/24/17
+ * Last update: 5/26/17
  * 
  */
 
@@ -188,7 +188,7 @@ namespace USBSoftwareLoader
         /// <returns></returns>
         private string getECL(string softwarePartNumber)
         {
-            int dash;
+            int dashIndex;
             string tempECLStr;
             string softwarePartOne = softwarePartNumber.Substring(4, 5);
 
@@ -205,7 +205,7 @@ namespace USBSoftwareLoader
                              .FirstOrDefault();
 
                 tempECLStr = eclDir.Substring(eclDir.Length - 6);
-                dash = tempECLStr.IndexOf("-", StringComparison.CurrentCulture);
+                dashIndex = tempECLStr.IndexOf("-", StringComparison.CurrentCulture);
             }
             catch (Exception ex)
             {
@@ -213,7 +213,7 @@ namespace USBSoftwareLoader
                 return string.Empty;
             }
 
-            return tempECLStr.Substring(dash + 1);
+            return tempECLStr.Substring(dashIndex + 1);
         }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace USBSoftwareLoader
         private void PopulateListView(ListView lView, bool updateLog)
         {
             if (updateLog)            
-                Logger.Log("Scanning for removable drives...", rt);           
+                Logger.Log("\nScanning for removable drives...", rt);           
 
             lView.Items.Clear();
 
@@ -321,15 +321,19 @@ namespace USBSoftwareLoader
                 ValidateCopyParams(cp.source, cp.dest);
 
                 // No exceptions, so continue....
+                Logger.Log("\nFinding latest software version...", rt);
+                Logger.Log("Latest software found: " + softwarePartNumber.Substring(6) + " ECL-" + ECL, rt);
+
                 // Show warning that drive will be erased
                 if (MessageBox.Show(new Form() { TopMost = true }, "The selected USB drive will be erased!\nDo you wish to continue?",
                     "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                {
+                    Logger.Log("Software loading operation cancelled.", rt, Color.Red);
                     return;
+                }
 
                 // Disable UI controls
-                DisableUI();
-                var logStr = string.Format("Starting to copy {0} ECL-{1}...", softwarePartNumber, ECL);
-                Logger.Log(logStr, rt);
+                DisableUI();                
 
                 // Begin the copy in BackgroundWorker, pass CopyParams object into it
                 bw.RunWorkerAsync(cp);
@@ -358,6 +362,10 @@ namespace USBSoftwareLoader
             {  // Catch user cancelling copy for RunWorkerCompleted to process
                 e.Cancel = true;
             }
+            finally
+            {
+                e.Result = cp;
+            }
         }
 
         private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -365,8 +373,7 @@ namespace USBSoftwareLoader
             if (e.Cancelled)
             {
                 // The user cancelled the operation.
-                //lblStatus.Text = "Ready";
-                Logger.Log("Software copying has been cancelled", rt, Color.Red);
+                Logger.Log("Software loading has been cancelled.", rt, Color.Red);
                 this.BringToFront();
                 this.Focus();
             }
@@ -384,8 +391,9 @@ namespace USBSoftwareLoader
             {
                 // The operation completed normally.
                 PictureBox1.Visible = true;
-                var logStr = "Software loaded successfully!";
-                Logger.Log(logStr, rt, Color.Green);
+                var cp = (CopyParams)e.Result;
+                var logStr = string.Format("Software {0} ECL-{1} was successfully loaded!", cp.swpn.Substring(6), cp.ecl);
+                Logger.Log(logStr, rt, Color.Green);                
             }
 
             // Enable UI controls            
@@ -405,10 +413,12 @@ namespace USBSoftwareLoader
             {
                 var dInfo = new DriveInfo(destDirs[i].Substring(0, 1));
                 dInfo.VolumeLabel = string.Format("{0} {1}", softwarePartNumber.Substring(10, 8), ECL);
+                ExecuteSecure(() => Logger.Log("\nErasing removable drive " + destDirs[i] + "...", rt) );
                 ClearFolder(destDirs[i]);
+                ExecuteSecure(() => Logger.Log(string.Format("Starting to copy {0} ECL-{1} to {2}...", softwarePartNumber, ECL, destDirs[i]), rt));
                 FileSystem.CopyDirectory(srcDir, destDirs[i], UIOption.AllDialogs, UICancelOption.ThrowException);
                 FileSystem.CopyFile(CALIBRATION_FILE, destDirs[i] + @"\FastFsUpdate.tar.gz", UIOption.AllDialogs, UICancelOption.ThrowException);
-                FileSystem.CopyFile(FORCE_UPDATE_FILE, destDirs[i] + @"\force_update.txt", UIOption.AllDialogs, UICancelOption.ThrowException);
+                FileSystem.CopyFile(FORCE_UPDATE_FILE, destDirs[i] + @"\force_update.txt", UIOption.AllDialogs, UICancelOption.ThrowException);                
             }
         }
 

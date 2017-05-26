@@ -38,11 +38,12 @@
             this.rbVesta = new System.Windows.Forms.RadioButton();
             this.rbPitco = new System.Windows.Forms.RadioButton();
             this.PictureBox1 = new System.Windows.Forms.PictureBox();
-            this.lblStatus = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox1)).BeginInit();
             this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // lvDrives
@@ -64,25 +65,26 @@
             // 
             // btnStartCopy
             // 
-            this.btnStartCopy.Location = new System.Drawing.Point(524, 183);
+            this.btnStartCopy.Location = new System.Drawing.Point(524, 190);
             this.btnStartCopy.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnStartCopy.Name = "btnStartCopy";
             this.btnStartCopy.Size = new System.Drawing.Size(123, 27);
             this.btnStartCopy.TabIndex = 1;
-            this.btnStartCopy.Text = "Copy Software";
+            this.btnStartCopy.Text = "Load Software";
             this.btnStartCopy.UseVisualStyleBackColor = true;
             this.btnStartCopy.Click += new System.EventHandler(this.btnStartCopy_click);
             // 
             // rt
             // 
             this.rt.BackColor = System.Drawing.Color.White;
-            this.rt.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rt.Location = new System.Drawing.Point(27, 203);
+            this.rt.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.rt.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rt.Location = new System.Drawing.Point(15, 25);
             this.rt.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.rt.Name = "rt";
             this.rt.ReadOnly = true;
             this.rt.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.rt.Size = new System.Drawing.Size(425, 145);
+            this.rt.Size = new System.Drawing.Size(425, 162);
             this.rt.TabIndex = 2;
             this.rt.Text = "";
             // 
@@ -150,23 +152,14 @@
             // 
             this.PictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.PictureBox1.Image = global::USBSoftwareLoader.Properties.Resources.checkmarkgreen;
-            this.PictureBox1.Location = new System.Drawing.Point(524, 245);
+            this.PictureBox1.Location = new System.Drawing.Point(524, 264);
             this.PictureBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.PictureBox1.Name = "PictureBox1";
-            this.PictureBox1.Size = new System.Drawing.Size(123, 103);
+            this.PictureBox1.Size = new System.Drawing.Size(123, 104);
             this.PictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.PictureBox1.TabIndex = 4;
             this.PictureBox1.TabStop = false;
             this.PictureBox1.Visible = false;
-            // 
-            // lblStatus
-            // 
-            this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(24, 183);
-            this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(43, 17);
-            this.lblStatus.TabIndex = 5;
-            this.lblStatus.Text = "Status";
             // 
             // groupBox2
             // 
@@ -178,16 +171,25 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Destination Drive";
             // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.rt);
+            this.groupBox3.Location = new System.Drawing.Point(12, 190);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(453, 203);
+            this.groupBox3.TabIndex = 8;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Status";
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(700, 368);
+            this.ClientSize = new System.Drawing.Size(700, 417);
+            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.PictureBox1);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.rt);
             this.Controls.Add(this.btnStartCopy);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -197,13 +199,13 @@
             this.Name = "Main";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Kitchen Brains USB Software Loader";
+            this.Text = "Kitchen Brains USB Software Loader v17.5.26.1";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox1)).EndInit();
             this.groupBox2.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -216,10 +218,10 @@
         private System.Windows.Forms.RadioButton rbVesta;
         private System.Windows.Forms.RadioButton rbPitco;
         private System.Windows.Forms.PictureBox PictureBox1;
-        private System.Windows.Forms.Label lblStatus;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label lblVestaSWPN;
         private System.Windows.Forms.Label lblPitcoSWPN;
+        private System.Windows.Forms.GroupBox groupBox3;
     }
 }
 
