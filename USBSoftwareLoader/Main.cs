@@ -413,8 +413,12 @@ namespace USBSoftwareLoader
             {
                 var dInfo = new DriveInfo(destDirs[i].Substring(0, 1));
                 dInfo.VolumeLabel = string.Format("{0} {1}", softwarePartNumber.Substring(10, 8), ECL);
-                ExecuteSecure(() => Logger.Log("\nErasing removable drive " + destDirs[i] + "...", rt) );
-                ClearFolder(destDirs[i]);
+                
+                // delete all files and directories of root dir on removable drive
+                ExecuteSecure(() => Logger.Log("\nErasing removable drive " + destDirs[i] + "...", rt));
+                DeleteDirContents(destDirs[i]);
+
+                // Begin copying
                 ExecuteSecure(() => Logger.Log(string.Format("Starting to copy {0} ECL-{1} to {2}...", softwarePartNumber, ECL, destDirs[i]), rt));
                 FileSystem.CopyDirectory(srcDir, destDirs[i], UIOption.AllDialogs, UICancelOption.ThrowException);
                 FileSystem.CopyFile(CALIBRATION_FILE, destDirs[i] + @"\FastFsUpdate.tar.gz", UIOption.AllDialogs, UICancelOption.ThrowException);
@@ -424,21 +428,25 @@ namespace USBSoftwareLoader
 
         private void EnableUI()
         {
-            // Enable UI controls               
-            this.Enabled = true;
+            // Enable UI controls
+            groupBox1.Enabled = true;
+            lvDrives.Enabled = true;
+            btnStartCopy.Enabled = true;
         }
 
         private void DisableUI()
         {
-            // Enable UI controls    
-            this.Enabled = false;
+            // Enable UI controls
+            groupBox1.Enabled = false;
+            lvDrives.Enabled = false;
+            btnStartCopy.Enabled = false;
         }
 
         /// <summary>
         /// Deletes all files and directories in a path, with no warning messages.
         /// </summary>
         /// <param name="path"></param>
-        private void ClearFolder(string path)
+        private void DeleteDirContents(string path)
         {
             DirectoryInfo dir = new DirectoryInfo(path);
 
@@ -447,8 +455,8 @@ namespace USBSoftwareLoader
             
             foreach (DirectoryInfo di in dir.GetDirectories())
             {
-                ClearFolder(di.FullName);
-                di.Delete();
+                DeleteDirContents(di.FullName);
+                di.Delete(true);
             }
         }
 
@@ -460,6 +468,11 @@ namespace USBSoftwareLoader
         public bool IsDirectoryEmpty(string path)
         {
             return !Directory.EnumerateFileSystemEntries(path).Any();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            PictureBox1.Image = USBSoftwareLoader.Properties.Resources.check;
         }
     }
 }

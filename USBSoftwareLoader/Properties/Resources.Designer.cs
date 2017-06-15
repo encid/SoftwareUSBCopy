@@ -63,9 +63,9 @@ namespace USBSoftwareLoader.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap checkmarkgreen {
+        internal static System.Drawing.Bitmap check {
             get {
-                object obj = ResourceManager.GetObject("checkmarkgreen", resourceCulture);
+                object obj = ResourceManager.GetObject("check", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
