@@ -57,6 +57,8 @@ namespace USBSoftwareLoader
             InitializeComponent();
             InitializeEventHandlers();
 
+            Logger.Log("Application loading.. ready.", rt);
+
             // Add (destination) removable drives to ListView
             PopulateListView(lvDrives, true);
 
@@ -296,7 +298,13 @@ namespace USBSoftwareLoader
             string softwareTopDir = "";
             var ECL = "";
             var softwarePartNumber = "";
-            PictureBox1.Visible = false;
+            PictureBox1.Image = USBSoftwareLoader.Properties.Resources.questionmark;
+
+            if (!Directory.Exists(VAULT_PATH))
+            {
+                Logger.Log(@"Error: Cannot find vault (V:\ drive).  Check network connection and try again.", rt, Color.Red);
+                return;
+            }
 
             try
             {
@@ -325,7 +333,7 @@ namespace USBSoftwareLoader
                 Logger.Log("Latest software found: " + softwarePartNumber.Substring(6) + " ECL-" + ECL, rt);
 
                 // Show warning that drive will be erased
-                if (MessageBox.Show(new Form() { TopMost = true }, "The selected USB drive will be erased!\nDo you wish to continue?",
+                if (MessageBox.Show(new Form { TopMost = true }, "The selected USB drive will be erased!\nDo you wish to continue?",
                     "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
                 {
                     Logger.Log("Software loading operation cancelled.", rt, Color.Red);
@@ -390,7 +398,7 @@ namespace USBSoftwareLoader
             else
             {
                 // The operation completed normally.
-                PictureBox1.Visible = true;
+                PictureBox1.Image = USBSoftwareLoader.Properties.Resources.check;
                 var cp = (CopyParams)e.Result;
                 var logStr = string.Format("Software {0} ECL-{1} was successfully loaded!", cp.swpn.Substring(6), cp.ecl);
                 Logger.Log(logStr, rt, Color.Green);                
@@ -468,11 +476,6 @@ namespace USBSoftwareLoader
         public bool IsDirectoryEmpty(string path)
         {
             return !Directory.EnumerateFileSystemEntries(path).Any();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            PictureBox1.Image = USBSoftwareLoader.Properties.Resources.check;
         }
     }
 }

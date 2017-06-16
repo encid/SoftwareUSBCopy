@@ -32,7 +32,6 @@
             this.lvDrives = new System.Windows.Forms.ListView();
             this.btnStartCopy = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.button1 = new System.Windows.Forms.Button();
             this.lblVestaSWPN = new System.Windows.Forms.Label();
             this.lblPitcoSWPN = new System.Windows.Forms.Label();
             this.rbVesta = new System.Windows.Forms.RadioButton();
@@ -73,7 +72,6 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Controls.Add(this.lblVestaSWPN);
             this.groupBox1.Controls.Add(this.lblPitcoSWPN);
             this.groupBox1.Controls.Add(this.rbVesta);
@@ -87,16 +85,6 @@
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Touchscreen Part Number";
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(53, 129);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 6;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // lblVestaSWPN
             // 
@@ -168,12 +156,13 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(126, 32);
             this.label1.TabIndex = 5;
-            this.label1.Text = "Version: 1.2                   06/15/17  15:08";
+            this.label1.Text = "Version: 1.2                   06/16/17  15:00";
             // 
             // PictureBox1
             // 
             this.PictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.PictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.PictureBox1.Image = global::USBSoftwareLoader.Properties.Resources.questionmark;
             this.PictureBox1.Location = new System.Drawing.Point(525, 200);
             this.PictureBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.PictureBox1.Name = "PictureBox1";
@@ -222,7 +211,6 @@
         private System.Windows.Forms.Label lblPitcoSWPN;
         private System.Windows.Forms.RichTextBox rt;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button button1;
     }
 }
 
