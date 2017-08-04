@@ -14,14 +14,18 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.ComponentModel;
+using System.Configuration;
 
 namespace USBSoftwareLoader
 {
     public partial class Main : Form
     {
-        public const string VAULT_PATH = @"\\pandora\vault\Released_Part_Information\240-XXXXX-XX_SOFTWARE\240-9XXXX-XX\240-91XXX-XX";
-        public const string CALIBRATION_FILE = @"\\ares\shared\Operations\Test Engineering\Test Softwares\USB Software Loader\FastFsUpdate.tar.gz";
-        public const string FORCE_UPDATE_FILE = @"\\ares\shared\Operations\Test Engineering\Test Softwares\USB Software Loader\force_update.txt";
+        //public const string VAULT_PATH = @"\\pandora\vault\Released_Part_Information\240-XXXXX-XX_SOFTWARE\240-9XXXX-XX\240-91XXX-XX";
+        //public const string CALIBRATION_FILE = @"\\ares\shared\Operations\Test Engineering\Test Softwares\USB Software Loader\FastFsUpdate.tar.gz";
+        //public const string FORCE_UPDATE_FILE = @"\\ares\shared\Operations\Test Engineering\Test Softwares\USB Software Loader\force_update.txt";
+        public string VAULT_PATH = ConfigurationManager.AppSettings["VAULT_PATH"];
+        public string CALIBRATION_FILE = Application.StartupPath + ConfigurationManager.AppSettings["CALIBRATION_FILE"];
+        public string FORCE_UPDATE_FILE = Application.StartupPath + ConfigurationManager.AppSettings["FORCE_UPDATE_FILE"];
         int currDriveCount;
         BackgroundWorker bw;
         Timer tmrRefresh = new Timer();
