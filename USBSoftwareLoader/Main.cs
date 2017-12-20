@@ -2,7 +2,7 @@
  * 
  * USB Software Loader
  * Designed by R. Cavallaro
- * Last update: 5/26/17
+ * Last update: 12/20/17
  * 
  */
 
@@ -20,9 +20,6 @@ namespace USBSoftwareLoader
 {
     public partial class Main : Form
     {
-        //public const string VAULT_PATH = @"\\pandora\vault\Released_Part_Information\240-XXXXX-XX_SOFTWARE\240-9XXXX-XX\240-91XXX-XX";
-        //public const string CALIBRATION_FILE = @"\\ares\shared\Operations\Test Engineering\Test Softwares\USB Software Loader\FastFsUpdate.tar.gz";
-        //public const string FORCE_UPDATE_FILE = @"\\ares\shared\Operations\Test Engineering\Test Softwares\USB Software Loader\force_update.txt";
         public string VAULT_PATH = ConfigurationManager.AppSettings["VAULT_PATH"];
         public string CALIBRATION_FILE = Application.StartupPath + ConfigurationManager.AppSettings["CALIBRATION_FILE"];
         public string FORCE_UPDATE_FILE = Application.StartupPath + ConfigurationManager.AppSettings["FORCE_UPDATE_FILE"];
@@ -32,15 +29,17 @@ namespace USBSoftwareLoader
 
         private struct CopyParams
         {
-            public readonly string source;
+            public readonly string source1;
+            public readonly string source2;
             public readonly List<string> dest;
             public readonly string swpn;
             public readonly string ecl;
-            public CopyParams(string _source, List<string> _destinations, string _swpn, string _ecl)
+            public CopyParams(string _source1, string _source2, List<string> _destinations, string _swpn, string _ecl)
             {
                 ecl = _ecl;
                 swpn = _swpn;
-                source = _source;
+                source1 = _source1;
+                source2 = _source2;
                 dest = _destinations;
             }
         }
@@ -196,11 +195,22 @@ namespace USBSoftwareLoader
         {
             int dashIndex;
             string tempECLStr;
+            string swDir;
             string softwarePartOne = softwarePartNumber.Substring(4, 5);
 
             try
             {
-                var softwareDir = (from sd in Directory.GetDirectories(string.Format(@"{0}\240-{1}-XX\", VAULT_PATH, softwarePartOne))
+                // Determine which folder we're looking in, 91XXX or 94XXX
+                if (softwarePartOne.Substring(0, 2) == "91")
+                {
+                    swDir = @"\240-91XXX-XX\";
+                }
+                else 
+                {
+                    swDir = @"\240-94XXX-XX\";
+                }
+
+                var softwareDir = (from sd in Directory.GetDirectories(string.Format(@"{0}\{1}\240-{2}-XX\", VAULT_PATH, swDir, softwarePartOne))
                                    where sd.Contains(softwarePartNumber)
                                    select sd)
                                   .FirstOrDefault();
@@ -299,8 +309,10 @@ namespace USBSoftwareLoader
         
         private void btnStartCopy_click(object sender, EventArgs e)
         {
-            string softwareTopDir = "";
-            var ECL = "";
+            string softwareTopDir1 = "";
+            string softwareTopDir2 = "";
+            var ECL1 = "";
+            var ECL2 = "";
             var softwarePartNumber = "";
             PictureBox1.Image = USBSoftwareLoader.Properties.Resources.questionmark;
 
@@ -315,26 +327,29 @@ namespace USBSoftwareLoader
                 // Get software dir based on what touchscreen version is selected, get ECL, and get full software dir
                 if (rbPitco.Checked)
                 {
-                    softwareTopDir = VAULT_PATH + @"\240-91452-XX\240-91452-03";
-                    ECL = getECL("240-91452-03");
+                    softwareTopDir1 = VAULT_PATH + @"\240-91XXX-XX\240-91452-XX\240-91452-03";
+                    softwareTopDir2 = VAULT_PATH + @"\240-94XXX-XX\240-94452-XX\240-94452-99";
+                    ECL1 = getECL("240-91452-03");
+                    ECL2 = getECL("240-94452-99");
                     softwarePartNumber = "Pitco 240-91452-03";
                 }
                 else if (rbVesta.Checked)
                 {
-                    softwareTopDir = VAULT_PATH + @"\240-91452-XX\240-91452-02";
-                    ECL = getECL("240-91452-02");
+                    softwareTopDir1 = VAULT_PATH + @"\240-91452-XX\240-91452-02";
+                    ECL1 = getECL("240-91452-02");
                     softwarePartNumber = "Vesta 240-91452-02";
                 }
 
-                var softwareDir = string.Format(@"{0}\ECL-{1}", softwareTopDir, ECL);              
-                var cp = new CopyParams(softwareDir, GetDestinationDirs(lvDrives), softwarePartNumber, ECL);
+                var softwareDir1 = string.Format(@"{0}\ECL-{1}", softwareTopDir1, ECL1);
+                var softwareDir2 = string.Format(@"{0}\ECL-{1}", softwareTopDir2, ECL2);
+                var cp = new CopyParams(softwareDir1, softwareDir2, GetDestinationDirs(lvDrives), softwarePartNumber, ECL1);
 
                 // Validate user input on UI
-                ValidateCopyParams(cp.source, cp.dest);
+                ValidateCopyParams(cp.source1, cp.dest);
 
                 // No exceptions, so continue....
                 Logger.Log("\nFinding latest software version...", rt);
-                Logger.Log("Latest software found: " + softwarePartNumber.Substring(6) + " ECL-" + ECL, rt);
+                Logger.Log("Latest software found: " + softwarePartNumber.Substring(6) + " ECL-" + ECL1, rt);
 
                 // Show warning that drive will be erased
                 if (MessageBox.Show(new Form { TopMost = true }, "The selected USB drive will be erased!\nDo you wish to continue?",
@@ -365,7 +380,7 @@ namespace USBSoftwareLoader
 
             try
             {                
-                PerformCopy(cp.source, cp.dest, cp.swpn, cp.ecl);                
+                PerformCopy(cp.source1, cp.source2, cp.dest, cp.swpn, cp.ecl);                
             }
             catch (ArgumentException)
             {  // Catch user removal of drive during copy for RunWorkerCompleted to process
@@ -416,9 +431,10 @@ namespace USBSoftwareLoader
         /// <summary>
         /// Begins a copy operation.
         /// </summary>
-        /// <param name="srcDir"></param>
+        /// <param name="sourceDir1"></param>
+        /// <param name="sourceDir2"></param>
         /// <param name="destDirs"></param>
-        private void PerformCopy(string srcDir, List<string> destDirs, string softwarePartNumber, string ECL)
+        private void PerformCopy(string sourceDir1, string sourceDir2, List<string> destDirs, string softwarePartNumber, string ECL)
         {
             // Start copy execution
             for (int i = 0; i < destDirs.Count; i++)
@@ -432,9 +448,9 @@ namespace USBSoftwareLoader
 
                 // Begin copying
                 ExecuteSecure(() => Logger.Log(string.Format("Starting to copy {0} ECL-{1} to {2}...", softwarePartNumber, ECL, destDirs[i]), rt));
-                FileSystem.CopyDirectory(srcDir, destDirs[i], UIOption.AllDialogs, UICancelOption.ThrowException);
-                FileSystem.CopyFile(CALIBRATION_FILE, destDirs[i] + @"\FastFsUpdate.tar.gz", UIOption.AllDialogs, UICancelOption.ThrowException);
-                FileSystem.CopyFile(FORCE_UPDATE_FILE, destDirs[i] + @"\force_update.txt", UIOption.AllDialogs, UICancelOption.ThrowException);                
+                FileSystem.CopyDirectory(sourceDir1, destDirs[i], UIOption.AllDialogs, UICancelOption.ThrowException);
+                FileSystem.CopyDirectory(sourceDir2, destDirs[i], UIOption.AllDialogs, UICancelOption.ThrowException);
+                FileSystem.CopyFile(FORCE_UPDATE_FILE, destDirs[i] + @"\force_update.txt", UIOption.AllDialogs, UICancelOption.ThrowException);
             }
         }
 
