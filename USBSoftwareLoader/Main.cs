@@ -2,7 +2,7 @@
  * 
  * USB Software Loader
  * Designed by R. Cavallaro
- * Last update: 12/20/17
+ * Last update: 9/12/18
  * 
  */
 
@@ -191,7 +191,7 @@ namespace USBSoftwareLoader
         /// </summary>
         /// <param name="softwarePartNumber"></param>
         /// <returns></returns>
-        private string getECL(string softwarePartNumber)
+        private string GetECL(string softwarePartNumber)
         {
             int dashIndex;
             string tempECLStr;
@@ -210,7 +210,7 @@ namespace USBSoftwareLoader
                     swDir = @"\240-94XXX-XX\";
                 }
 
-                var softwareDir = (from sd in Directory.GetDirectories(string.Format(@"{0}\{1}\240-{2}-XX\", VAULT_PATH, swDir, softwarePartOne))
+                var softwareDir = (from sd in Directory.GetDirectories($@"{VAULT_PATH}\{swDir}\240-{softwarePartOne}-XX\")
                                    where sd.Contains(softwarePartNumber)
                                    select sd)
                                   .FirstOrDefault();
@@ -276,7 +276,7 @@ namespace USBSoftwareLoader
             driveNames = driveNames.Substring(0, driveNames.Length - 2);
             if (updateLog)
             {
-                var logStr = string.Format("Detected {0} removable {1}: {2}", drives.Count(), "drive".Pluralize(drives.Count()), driveNames);
+                var logStr = $"Detected {drives.Count()} removable {"drive".Pluralize(drives.Count())}: {driveNames}";                
                 Logger.Log(logStr, rt);
             }
         }
@@ -329,19 +329,19 @@ namespace USBSoftwareLoader
                 {
                     softwareTopDir1 = VAULT_PATH + @"\240-91XXX-XX\240-91452-XX\240-91452-03";
                     softwareTopDir2 = VAULT_PATH + @"\240-94XXX-XX\240-94452-XX\240-94452-99";
-                    ECL1 = getECL("240-91452-03");
-                    ECL2 = getECL("240-94452-99");
+                    ECL1 = GetECL("240-91452-03");
+                    ECL2 = GetECL("240-94452-99");
                     softwarePartNumber = "Pitco 240-91452-03";
                 }
                 else if (rbVesta.Checked)
                 {
                     softwareTopDir1 = VAULT_PATH + @"\240-91452-XX\240-91452-02";
-                    ECL1 = getECL("240-91452-02");
+                    ECL1 = GetECL("240-91452-02");
                     softwarePartNumber = "Vesta 240-91452-02";
                 }
 
-                var softwareDir1 = string.Format(@"{0}\ECL-{1}", softwareTopDir1, ECL1);
-                var softwareDir2 = string.Format(@"{0}\ECL-{1}", softwareTopDir2, ECL2);
+                var softwareDir1 = $@"{softwareTopDir1}\ECL-{ECL1}";
+                var softwareDir2 = $@"{softwareTopDir2}\ECL-{ECL2}";
                 var cp = new CopyParams(softwareDir1, softwareDir2, GetDestinationDirs(lvDrives), softwarePartNumber, ECL1);
 
                 // Validate user input on UI
@@ -367,7 +367,7 @@ namespace USBSoftwareLoader
             }
             catch (Exception ex)
             {
-                var logStr = string.Format("Error: {0}", ex.Message);
+                var logStr = $"Error: {ex.Message}";
                 Logger.Log(logStr, rt, Color.Red);
                 if (ex.Message.Contains("Target destination drive does not exist"))
                     PopulateListView(lvDrives, false);
@@ -408,7 +408,7 @@ namespace USBSoftwareLoader
             {
                 // There was an error during the operation
                 PopulateListView(lvDrives, false);
-                var logStr = string.Format("An error has occured: {0}", e.Error.Message);
+                var logStr = $"An error has occured: {e.Error.Message}";
                 Logger.Log(logStr, rt, Color.Red);
                 MessageBox.Show("An error has occured: " + e.Error.Message, "USB Software Loader", MessageBoxButtons.OK);
                 this.BringToFront();
@@ -417,9 +417,9 @@ namespace USBSoftwareLoader
             else
             {
                 // The operation completed normally.
-                PictureBox1.Image = USBSoftwareLoader.Properties.Resources.check;
+                PictureBox1.Image = Properties.Resources.check;
                 var cp = (CopyParams)e.Result;
-                var logStr = string.Format("Software {0} ECL-{1} was successfully loaded!", cp.swpn.Substring(6), cp.ecl);
+                var logStr = $"Software {cp.swpn.Substring(6)} ECL-{cp.ecl} was successfully loaded!";
                 Logger.Log(logStr, rt, Color.Green);                
             }
 
@@ -440,14 +440,14 @@ namespace USBSoftwareLoader
             for (int i = 0; i < destDirs.Count; i++)
             {
                 var dInfo = new DriveInfo(destDirs[i].Substring(0, 1));
-                dInfo.VolumeLabel = string.Format("{0} {1}", softwarePartNumber.Substring(10, 8), ECL);
+                dInfo.VolumeLabel = $"{softwarePartNumber.Substring(10, 8)} {ECL}";
                 
                 // delete all files and directories of root dir on removable drive
                 ExecuteSecure(() => Logger.Log("\nErasing removable drive " + destDirs[i] + "...", rt));
                 DeleteDirContents(destDirs[i]);
 
                 // Begin copying
-                ExecuteSecure(() => Logger.Log(string.Format("Starting to copy {0} ECL-{1} to {2}...", softwarePartNumber, ECL, destDirs[i]), rt));
+                ExecuteSecure(() => Logger.Log($"Starting to copy {softwarePartNumber} ECL-{ECL} to {destDirs[i]}...", rt));
                 FileSystem.CopyDirectory(sourceDir1, destDirs[i], UIOption.AllDialogs, UICancelOption.ThrowException);
                 FileSystem.CopyDirectory(sourceDir2, destDirs[i], UIOption.AllDialogs, UICancelOption.ThrowException);
                 FileSystem.CopyFile(FORCE_UPDATE_FILE, destDirs[i] + @"\force_update.txt", UIOption.AllDialogs, UICancelOption.ThrowException);
@@ -496,6 +496,36 @@ namespace USBSoftwareLoader
         public bool IsDirectoryEmpty(string path)
         {
             return !Directory.EnumerateFileSystemEntries(path).Any();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string softwareVersion;
+            if (!Directory.Exists(VAULT_PATH))
+            {
+                Logger.Log(@"Error: Cannot find vault (V:\ drive).  Check network connection and try again.", rt, Color.Red);
+                return;
+            }
+
+            try
+            {
+                // Get software ECL based on what radio button is checked
+                if (rbPitco.Checked)
+                {
+                    softwareVersion = GetECL("240-91452-03");
+                    var softwareVersion2 = GetECL("240-94452-99");
+                    Logger.Log($"Current version of Pitco software 240-91452-03: ECL-{softwareVersion}", rt);
+                    Logger.Log($"Current version of Pitco software 240-94452-99: ECL-{softwareVersion2}", rt);
+                }
+                else if (rbVesta.Checked)
+                {
+                    softwareVersion = GetECL("240-91452-02");
+                }
+            }
+            catch
+            {
+
+            }
         }
     }
 }
