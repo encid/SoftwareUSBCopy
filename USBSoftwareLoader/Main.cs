@@ -2,7 +2,7 @@
  * 
  * USB Software Loader
  * Designed by R. Cavallaro
- * Last update: 9/12/18
+ * Last update: 1/10/19
  * 
  */
 
@@ -23,35 +23,25 @@ namespace USBSoftwareLoader
         public string VAULT_PATH = ConfigurationManager.AppSettings["VAULT_PATH"];
         public string CALIBRATION_FILE = Application.StartupPath + ConfigurationManager.AppSettings["CALIBRATION_FILE"];
         public string FORCE_UPDATE_FILE = Application.StartupPath + ConfigurationManager.AppSettings["FORCE_UPDATE_FILE"];
-        int currDriveCount;
+        public int currDriveCount { get; set; } 
         BackgroundWorker bw;
         Timer tmrRefresh = new Timer();
-
-        private struct CopyParams
+        
+        class CopyParams
         {
-            public readonly string source1;
-            public readonly string source2;
-            public readonly List<string> dest;
-            public readonly string swpn;
-            public readonly string ecl;
-            public CopyParams(string _source1, string _source2, List<string> _destinations, string _swpn, string _ecl)
+            public string Source1 { get; set; }
+            public string Source2 { get; set; }
+            public List<string> Destinations { get; set; }
+            public string SoftwarePartNumber { get; set; }
+            public string ECL { get; set; }  
+                
+            public CopyParams(string source1, string source2, List<string> destinations, string softwarepartnumber, string ecl)
             {
-                ecl = _ecl;
-                swpn = _swpn;
-                source1 = _source1;
-                source2 = _source2;
-                dest = _destinations;
-            }
-        }
-
-        private struct ProgressParams
-        {
-            public int currentDrive;
-            public readonly int totalDrives;
-            public ProgressParams(int _currentDrive, int _totalDrives)
-            {
-                currentDrive = _currentDrive;
-                totalDrives = _totalDrives;
+                ECL = ecl;
+                SoftwarePartNumber = softwarepartnumber;
+                Source1 = source1;
+                Source2 = source2;
+                Destinations = destinations;
             }
         }
 
@@ -314,6 +304,8 @@ namespace USBSoftwareLoader
             var ECL1 = "";
             var ECL2 = "";
             var softwarePartNumber = "";
+            var softwareDir1 = "";
+            var softwareDir2 = "";
             PictureBox1.Image = USBSoftwareLoader.Properties.Resources.questionmark;
 
             if (!Directory.Exists(VAULT_PATH))
@@ -332,20 +324,23 @@ namespace USBSoftwareLoader
                     ECL1 = GetECL("240-91452-03");
                     ECL2 = GetECL("240-94452-99");
                     softwarePartNumber = "Pitco 240-91452-03";
+                    softwareDir1 = $@"{softwareTopDir1}\ECL-{ECL1}";
+                    softwareDir2 = $@"{softwareTopDir2}\ECL-{ECL2}";
                 }
                 else if (rbVesta.Checked)
                 {
-                    softwareTopDir1 = VAULT_PATH + @"\240-91452-XX\240-91452-02";
+                    softwareTopDir1 = VAULT_PATH + @"\240-91XXX-XX\240-91452-XX\240-91452-02";
                     ECL1 = GetECL("240-91452-02");
                     softwarePartNumber = "Vesta 240-91452-02";
+                    softwareDir1 = $@"{softwareTopDir1}\ECL-{ECL1}";
+                    softwareDir2 = "";
                 }
-
-                var softwareDir1 = $@"{softwareTopDir1}\ECL-{ECL1}";
-                var softwareDir2 = $@"{softwareTopDir2}\ECL-{ECL2}";
+                
                 var cp = new CopyParams(softwareDir1, softwareDir2, GetDestinationDirs(lvDrives), softwarePartNumber, ECL1);
 
                 // Validate user input on UI
-                ValidateCopyParams(cp.source1, cp.dest);
+                MessageBox.Show(cp.Source1);
+                ValidateCopyParams(cp.Source1, cp.Destinations);
 
                 // No exceptions, so continue....
                 Logger.Log("\nFinding latest software version...", rt);
@@ -380,7 +375,7 @@ namespace USBSoftwareLoader
 
             try
             {                
-                PerformCopy(cp.source1, cp.source2, cp.dest, cp.swpn, cp.ecl);                
+                PerformCopy(cp.Source1, cp.Source2, cp.Destinations, cp.SoftwarePartNumber, cp.ECL);                
             }
             catch (ArgumentException)
             {  // Catch user removal of drive during copy for RunWorkerCompleted to process
@@ -419,7 +414,7 @@ namespace USBSoftwareLoader
                 // The operation completed normally.
                 PictureBox1.Image = Properties.Resources.check;
                 var cp = (CopyParams)e.Result;
-                var logStr = $"Software {cp.swpn.Substring(6)} ECL-{cp.ecl} was successfully loaded!";
+                var logStr = $"Software {cp.SoftwarePartNumber.Substring(6)} ECL-{cp.ECL} was successfully loaded!";
                 Logger.Log(logStr, rt, Color.Green);                
             }
 
@@ -440,6 +435,7 @@ namespace USBSoftwareLoader
             for (int i = 0; i < destDirs.Count; i++)
             {
                 var dInfo = new DriveInfo(destDirs[i].Substring(0, 1));
+                // Set volume label
                 dInfo.VolumeLabel = $"{softwarePartNumber.Substring(10, 8)} {ECL}";
                 
                 // delete all files and directories of root dir on removable drive
@@ -449,7 +445,8 @@ namespace USBSoftwareLoader
                 // Begin copying
                 ExecuteSecure(() => Logger.Log($"Starting to copy {softwarePartNumber} ECL-{ECL} to {destDirs[i]}...", rt));
                 FileSystem.CopyDirectory(sourceDir1, destDirs[i], UIOption.AllDialogs, UICancelOption.ThrowException);
-                FileSystem.CopyDirectory(sourceDir2, destDirs[i], UIOption.AllDialogs, UICancelOption.ThrowException);
+                if (sourceDir2 != "")
+                    FileSystem.CopyDirectory(sourceDir2, destDirs[i], UIOption.AllDialogs, UICancelOption.ThrowException);
                 FileSystem.CopyFile(FORCE_UPDATE_FILE, destDirs[i] + @"\force_update.txt", UIOption.AllDialogs, UICancelOption.ThrowException);
             }
         }
@@ -498,7 +495,7 @@ namespace USBSoftwareLoader
             return !Directory.EnumerateFileSystemEntries(path).Any();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void btnCheckVersion_click(object sender, EventArgs e)
         {
             string softwareVersion;
             if (!Directory.Exists(VAULT_PATH))
@@ -520,6 +517,7 @@ namespace USBSoftwareLoader
                 else if (rbVesta.Checked)
                 {
                     softwareVersion = GetECL("240-91452-02");
+                    Logger.Log($"Current version of Vesta software 240-91452-02: ECL-{softwareVersion}", rt);
                 }
             }
             catch

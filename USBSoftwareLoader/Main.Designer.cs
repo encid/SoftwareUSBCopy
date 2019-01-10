@@ -39,7 +39,7 @@
             this.rt = new System.Windows.Forms.RichTextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.PictureBox1 = new System.Windows.Forms.PictureBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnCheckVersion = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -110,7 +110,6 @@
             // rbVesta
             // 
             this.rbVesta.AutoSize = true;
-            this.rbVesta.Enabled = false;
             this.rbVesta.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.rbVesta.Location = new System.Drawing.Point(12, 72);
             this.rbVesta.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -157,7 +156,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(126, 32);
             this.label1.TabIndex = 5;
-            this.label1.Text = "Version: 1.5                   9/12/18  07:48";
+            this.label1.Text = "Version: 1.6                   1/10/19  14:04";
             // 
             // PictureBox1
             // 
@@ -172,23 +171,23 @@
             this.PictureBox1.TabIndex = 4;
             this.PictureBox1.TabStop = false;
             // 
-            // button1
+            // btnCheckVersion
             // 
-            this.button1.Location = new System.Drawing.Point(507, 139);
-            this.button1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(125, 25);
-            this.button1.TabIndex = 6;
-            this.button1.Text = "Get S/W Version";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.btnCheckVersion.Location = new System.Drawing.Point(507, 139);
+            this.btnCheckVersion.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnCheckVersion.Name = "btnCheckVersion";
+            this.btnCheckVersion.Size = new System.Drawing.Size(125, 25);
+            this.btnCheckVersion.TabIndex = 6;
+            this.btnCheckVersion.Text = "Get S/W Version";
+            this.btnCheckVersion.UseVisualStyleBackColor = true;
+            this.btnCheckVersion.Click += new System.EventHandler(this.btnCheckVersion_click);
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(635, 335);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnCheckVersion);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.rt);
             this.Controls.Add(this.lvDrives);
@@ -224,7 +223,7 @@
         private System.Windows.Forms.Label lblPitcoSWPN;
         private System.Windows.Forms.RichTextBox rt;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnCheckVersion;
     }
 }
 
