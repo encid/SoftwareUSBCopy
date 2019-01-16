@@ -62,10 +62,11 @@
             // 
             // btnStartCopy
             // 
+            this.btnStartCopy.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnStartCopy.Location = new System.Drawing.Point(507, 168);
             this.btnStartCopy.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnStartCopy.Name = "btnStartCopy";
-            this.btnStartCopy.Size = new System.Drawing.Size(125, 25);
+            this.btnStartCopy.Size = new System.Drawing.Size(125, 40);
             this.btnStartCopy.TabIndex = 1;
             this.btnStartCopy.Text = "Load Software";
             this.btnStartCopy.UseVisualStyleBackColor = true;
@@ -82,7 +83,7 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox1.Size = new System.Drawing.Size(198, 126);
+            this.groupBox1.Size = new System.Drawing.Size(198, 120);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Touchscreen Part Number";
@@ -137,7 +138,7 @@
             // 
             this.rt.BackColor = System.Drawing.Color.WhiteSmoke;
             this.rt.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rt.Location = new System.Drawing.Point(3, 172);
+            this.rt.Location = new System.Drawing.Point(3, 182);
             this.rt.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.rt.Name = "rt";
             this.rt.ReadOnly = true;
@@ -151,19 +152,19 @@
             this.label1.AutoSize = true;
             this.label1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(507, 294);
+            this.label1.Location = new System.Drawing.Point(507, 306);
             this.label1.MaximumSize = new System.Drawing.Size(126, 70);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(126, 32);
             this.label1.TabIndex = 5;
-            this.label1.Text = "Version: 1.6                   1/10/19  14:04";
+            this.label1.Text = "Version: 1.6.1                 1/16/19  13:35";
             // 
             // PictureBox1
             // 
             this.PictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.PictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.PictureBox1.Image = global::USBSoftwareLoader.Properties.Resources.questionmark;
-            this.PictureBox1.Location = new System.Drawing.Point(525, 200);
+            this.PictureBox1.Location = new System.Drawing.Point(526, 212);
             this.PictureBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.PictureBox1.Name = "PictureBox1";
             this.PictureBox1.Size = new System.Drawing.Size(90, 90);
@@ -173,12 +174,13 @@
             // 
             // btnCheckVersion
             // 
-            this.btnCheckVersion.Location = new System.Drawing.Point(507, 139);
+            this.btnCheckVersion.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCheckVersion.Location = new System.Drawing.Point(507, 129);
             this.btnCheckVersion.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnCheckVersion.Name = "btnCheckVersion";
-            this.btnCheckVersion.Size = new System.Drawing.Size(125, 25);
+            this.btnCheckVersion.Size = new System.Drawing.Size(125, 35);
             this.btnCheckVersion.TabIndex = 6;
-            this.btnCheckVersion.Text = "Get S/W Version";
+            this.btnCheckVersion.Text = "Check Vault for Latest S/W Version";
             this.btnCheckVersion.UseVisualStyleBackColor = true;
             this.btnCheckVersion.Click += new System.EventHandler(this.btnCheckVersion_click);
             // 
@@ -186,7 +188,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(635, 335);
+            this.ClientSize = new System.Drawing.Size(635, 347);
             this.Controls.Add(this.btnCheckVersion);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.rt);

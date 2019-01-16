@@ -510,9 +510,9 @@ namespace USBSoftwareLoader
                 if (rbPitco.Checked)
                 {
                     softwareVersion = GetECL("240-91452-03");
-                    var softwareVersion2 = GetECL("240-94452-99");
+                    //var softwareVersion2 = GetECL("240-94452-99");
                     Logger.Log($"Current version of Pitco software 240-91452-03: ECL-{softwareVersion}", rt);
-                    Logger.Log($"Current version of Pitco software 240-94452-99: ECL-{softwareVersion2}", rt);
+                    //Logger.Log($"Current version of Pitco software 240-94452-99: ECL-{softwareVersion2}", rt);
                 }
                 else if (rbVesta.Checked)
                 {
