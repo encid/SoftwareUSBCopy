@@ -339,7 +339,6 @@ namespace USBSoftwareLoader
                 var cp = new CopyParams(softwareDir1, softwareDir2, GetDestinationDirs(lvDrives), softwarePartNumber, ECL1);
 
                 // Validate user input on UI
-                MessageBox.Show(cp.Source1);
                 ValidateCopyParams(cp.Source1, cp.Destinations);
 
                 // No exceptions, so continue....
