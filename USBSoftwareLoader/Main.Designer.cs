@@ -138,12 +138,12 @@
             // 
             this.rt.BackColor = System.Drawing.Color.WhiteSmoke;
             this.rt.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rt.Location = new System.Drawing.Point(3, 182);
+            this.rt.Location = new System.Drawing.Point(3, 172);
             this.rt.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.rt.Name = "rt";
             this.rt.ReadOnly = true;
             this.rt.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.rt.Size = new System.Drawing.Size(498, 162);
+            this.rt.Size = new System.Drawing.Size(498, 172);
             this.rt.TabIndex = 2;
             this.rt.Text = "";
             // 
@@ -157,7 +157,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(126, 32);
             this.label1.TabIndex = 5;
-            this.label1.Text = "Version: 1.6.1                 1/16/19  13:35";
+            this.label1.Text = "Version: 1.6.2                 1/23/19  10:24";
             // 
             // PictureBox1
             // 

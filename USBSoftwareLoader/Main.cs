@@ -456,6 +456,7 @@ namespace USBSoftwareLoader
             groupBox1.Enabled = true;
             lvDrives.Enabled = true;
             btnStartCopy.Enabled = true;
+            btnCheckVersion.Enabled = true;
         }
 
         private void DisableUI()
@@ -464,6 +465,7 @@ namespace USBSoftwareLoader
             groupBox1.Enabled = false;
             lvDrives.Enabled = false;
             btnStartCopy.Enabled = false;
+            btnCheckVersion.Enabled = false;
         }
 
         /// <summary>
@@ -478,20 +480,7 @@ namespace USBSoftwareLoader
                 fi.Delete();
             
             foreach (DirectoryInfo di in dir.GetDirectories())
-            {
-                DeleteDirContents(di.FullName);
                 di.Delete(true);
-            }
-        }
-
-        /// <summary>
-        /// Check if specified directory is empty.
-        /// </summary>
-        /// <param name="path">Path to check.</param>
-        /// <returns></returns>
-        public bool IsDirectoryEmpty(string path)
-        {
-            return !Directory.EnumerateFileSystemEntries(path).Any();
         }
 
         private void btnCheckVersion_click(object sender, EventArgs e)
@@ -510,13 +499,13 @@ namespace USBSoftwareLoader
                 {
                     softwareVersion = GetECL("240-91452-03");
                     //var softwareVersion2 = GetECL("240-94452-99");
-                    Logger.Log($"Current version of Pitco software 240-91452-03: ECL-{softwareVersion}", rt);
+                    Logger.Log($"Current released version of Pitco software 240-91452-03: ECL-{softwareVersion}", rt);
                     //Logger.Log($"Current version of Pitco software 240-94452-99: ECL-{softwareVersion2}", rt);
                 }
                 else if (rbVesta.Checked)
                 {
                     softwareVersion = GetECL("240-91452-02");
-                    Logger.Log($"Current version of Vesta software 240-91452-02: ECL-{softwareVersion}", rt);
+                    Logger.Log($"Current released version of Vesta software 240-91452-02: ECL-{softwareVersion}", rt);
                 }
             }
             catch
