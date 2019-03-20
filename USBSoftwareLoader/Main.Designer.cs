@@ -139,7 +139,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(126, 32);
             this.label1.TabIndex = 5;
-            this.label1.Text = "Version: 1.7.0                 3/20/19  11:01";
+            this.label1.Text = "Version: 1.7.1                 3/20/19  11:06";
             // 
             // PictureBox1
             // 
