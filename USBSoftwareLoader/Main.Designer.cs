@@ -32,10 +32,9 @@
             this.lvDrives = new System.Windows.Forms.ListView();
             this.btnStartCopy = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.lblVestaSWPN = new System.Windows.Forms.Label();
-            this.lblPitcoSWPN = new System.Windows.Forms.Label();
-            this.rbVesta = new System.Windows.Forms.RadioButton();
-            this.rbPitco = new System.Windows.Forms.RadioButton();
+            this.cboAssembly = new System.Windows.Forms.ComboBox();
+            this.lblSw = new System.Windows.Forms.Label();
+            this.lblSoftware = new System.Windows.Forms.Label();
             this.rt = new System.Windows.Forms.RichTextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.PictureBox1 = new System.Windows.Forms.PictureBox();
@@ -74,65 +73,48 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.lblVestaSWPN);
-            this.groupBox1.Controls.Add(this.lblPitcoSWPN);
-            this.groupBox1.Controls.Add(this.rbVesta);
-            this.groupBox1.Controls.Add(this.rbPitco);
+            this.groupBox1.Controls.Add(this.cboAssembly);
+            this.groupBox1.Controls.Add(this.lblSw);
+            this.groupBox1.Controls.Add(this.lblSoftware);
             this.groupBox1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox1.Location = new System.Drawing.Point(434, 5);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox1.Size = new System.Drawing.Size(198, 120);
+            this.groupBox1.Size = new System.Drawing.Size(198, 106);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Touchscreen Part Number";
+            this.groupBox1.Text = "Assembly Part Number";
             // 
-            // lblVestaSWPN
+            // cboAssembly
             // 
-            this.lblVestaSWPN.AutoSize = true;
-            this.lblVestaSWPN.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblVestaSWPN.Location = new System.Drawing.Point(32, 90);
-            this.lblVestaSWPN.Name = "lblVestaSWPN";
-            this.lblVestaSWPN.Size = new System.Drawing.Size(115, 17);
-            this.lblVestaSWPN.TabIndex = 3;
-            this.lblVestaSWPN.Text = "s/w: 240-91452-02";
+            this.cboAssembly.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboAssembly.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cboAssembly.FormattingEnabled = true;
+            this.cboAssembly.Location = new System.Drawing.Point(28, 33);
+            this.cboAssembly.Name = "cboAssembly";
+            this.cboAssembly.Size = new System.Drawing.Size(147, 25);
+            this.cboAssembly.TabIndex = 4;
+            this.cboAssembly.SelectedIndexChanged += new System.EventHandler(this.cboAssembly_SelectedValueChanged);
             // 
-            // lblPitcoSWPN
+            // lblSw
             // 
-            this.lblPitcoSWPN.AutoSize = true;
-            this.lblPitcoSWPN.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPitcoSWPN.Location = new System.Drawing.Point(32, 44);
-            this.lblPitcoSWPN.Name = "lblPitcoSWPN";
-            this.lblPitcoSWPN.Size = new System.Drawing.Size(115, 17);
-            this.lblPitcoSWPN.TabIndex = 2;
-            this.lblPitcoSWPN.Text = "s/w: 240-91452-03";
+            this.lblSw.AutoSize = true;
+            this.lblSw.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSw.Location = new System.Drawing.Point(25, 71);
+            this.lblSw.Name = "lblSw";
+            this.lblSw.Size = new System.Drawing.Size(62, 17);
+            this.lblSw.TabIndex = 2;
+            this.lblSw.Text = "Software:";
             // 
-            // rbVesta
+            // lblSoftware
             // 
-            this.rbVesta.AutoSize = true;
-            this.rbVesta.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rbVesta.Location = new System.Drawing.Point(12, 72);
-            this.rbVesta.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.rbVesta.Name = "rbVesta";
-            this.rbVesta.Size = new System.Drawing.Size(150, 21);
-            this.rbVesta.TabIndex = 1;
-            this.rbVesta.TabStop = true;
-            this.rbVesta.Text = "231-60295-70 (Vesta)";
-            this.rbVesta.UseVisualStyleBackColor = true;
-            // 
-            // rbPitco
-            // 
-            this.rbPitco.AutoSize = true;
-            this.rbPitco.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rbPitco.Location = new System.Drawing.Point(12, 26);
-            this.rbPitco.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.rbPitco.Name = "rbPitco";
-            this.rbPitco.Size = new System.Drawing.Size(146, 21);
-            this.rbPitco.TabIndex = 0;
-            this.rbPitco.TabStop = true;
-            this.rbPitco.Text = "231-60295-60 (Pitco)";
-            this.rbPitco.UseVisualStyleBackColor = true;
+            this.lblSoftware.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSoftware.Location = new System.Drawing.Point(87, 71);
+            this.lblSoftware.Name = "lblSoftware";
+            this.lblSoftware.Size = new System.Drawing.Size(88, 17);
+            this.lblSoftware.TabIndex = 3;
+            this.lblSoftware.Text = "                         ";
             // 
             // rt
             // 
@@ -157,7 +139,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(126, 32);
             this.label1.TabIndex = 5;
-            this.label1.Text = "Version: 1.6.2                 1/23/19  10:24";
+            this.label1.Text = "Version: 1.7.0                 3/20/19  11:01";
             // 
             // PictureBox1
             // 
@@ -175,10 +157,10 @@
             // btnCheckVersion
             // 
             this.btnCheckVersion.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCheckVersion.Location = new System.Drawing.Point(507, 129);
+            this.btnCheckVersion.Location = new System.Drawing.Point(507, 124);
             this.btnCheckVersion.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnCheckVersion.Name = "btnCheckVersion";
-            this.btnCheckVersion.Size = new System.Drawing.Size(125, 35);
+            this.btnCheckVersion.Size = new System.Drawing.Size(125, 40);
             this.btnCheckVersion.TabIndex = 6;
             this.btnCheckVersion.Text = "Check Vault for Latest S/W Version";
             this.btnCheckVersion.UseVisualStyleBackColor = true;
@@ -218,14 +200,13 @@
         private System.Windows.Forms.ListView lvDrives;
         private System.Windows.Forms.Button btnStartCopy;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.RadioButton rbVesta;
-        private System.Windows.Forms.RadioButton rbPitco;
         private System.Windows.Forms.PictureBox PictureBox1;
-        private System.Windows.Forms.Label lblVestaSWPN;
-        private System.Windows.Forms.Label lblPitcoSWPN;
+        private System.Windows.Forms.Label lblSoftware;
+        private System.Windows.Forms.Label lblSw;
         private System.Windows.Forms.RichTextBox rt;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnCheckVersion;
+        private System.Windows.Forms.ComboBox cboAssembly;
     }
 }
 

@@ -2,7 +2,7 @@
  * 
  * USB Software Loader
  * Designed by R. Cavallaro
- * Last update: 1/10/19
+ * Last update: 3/20/19
  * 
  */
 
@@ -23,7 +23,9 @@ namespace USBSoftwareLoader
         public string VAULT_PATH = ConfigurationManager.AppSettings["VAULT_PATH"];
         public string CALIBRATION_FILE = Application.StartupPath + ConfigurationManager.AppSettings["CALIBRATION_FILE"];
         public string FORCE_UPDATE_FILE = Application.StartupPath + ConfigurationManager.AppSettings["FORCE_UPDATE_FILE"];
-        public int currDriveCount { get; set; } 
+        public string ASSEMBLY_SOFTWARE_FILE = Application.StartupPath + ConfigurationManager.AppSettings["ASSEMBLY_SOFTWARE_FILE"];
+        public int currDriveCount { get; set; }
+        public Dictionary<string, string> AssemblyDict = new Dictionary<string, string>();
         BackgroundWorker bw;
         Timer tmrRefresh = new Timer();
         
@@ -33,15 +35,19 @@ namespace USBSoftwareLoader
             public string Source2 { get; set; }
             public List<string> Destinations { get; set; }
             public string SoftwarePartNumber { get; set; }
-            public string ECL { get; set; }  
-                
-            public CopyParams(string source1, string source2, List<string> destinations, string softwarepartnumber, string ecl)
+            public string ECL1 { get; set; }
+            public string ECL2 { get; set; }
+            public bool EraseUSB { get; set; }
+
+            public CopyParams(string source1, string source2, List<string> destinations, string softwarepartnumber, string ecl1, string ecl2, bool eraseusb)
             {
-                ECL = ecl;
+                ECL1 = ecl1;
+                ECL2 = ecl2;
                 SoftwarePartNumber = softwarepartnumber;
                 Source1 = source1;
                 Source2 = source2;
                 Destinations = destinations;
+                EraseUSB = eraseusb;
             }
         }
 
@@ -50,14 +56,22 @@ namespace USBSoftwareLoader
             InitializeComponent();
             InitializeEventHandlers();
 
-            Logger.Log("Application loading.. ready.", rt);
+            Logger.Log($"Kitchen Brains USB Software Loader version: {ProductVersion}", rt);
 
             // Add (destination) removable drives to ListView
             PopulateListView(lvDrives, true);
 
             currDriveCount = lvDrives.Items.Count;
-                        
-            rbPitco.Checked = true;
+
+            AssemblyDict = ReadSoftwareFileToDict(ASSEMBLY_SOFTWARE_FILE);
+
+            // Populate combobox of assemblies
+            foreach (var x in AssemblyDict)
+            {
+                cboAssembly.Items.Add(x.Key);
+            }
+
+            cboAssembly.SelectedIndex = 0;
         }
 
         public void InitializeEventHandlers()
@@ -75,11 +89,11 @@ namespace USBSoftwareLoader
                 currDriveCount = drives.Count();
             };
 
-                // Tick the checkbox if any part of the item line in ListView is clicked
-                lvDrives.MouseClick += (s, e) => 
+            // Tick the checkbox if any part of the item line in ListView is clicked
+            lvDrives.MouseClick += (s, e) => 
             {
                 var lvi = lvDrives.GetItemAt(e.X, e.Y);
-                if (e.X > 16) lvi.Checked = !lvi.Checked;
+                if (e.X > 16) lvi.Checked = !(lvi.Checked);
             };
 
             // Add columns to the ListView
@@ -87,7 +101,7 @@ namespace USBSoftwareLoader
             lvDrives.Columns.Add("Volume Name", 110, HorizontalAlignment.Left);
             lvDrives.Columns.Add("File System", -2, HorizontalAlignment.Left);
             lvDrives.Columns.Add("Capacity", -2, HorizontalAlignment.Left);
-            lvDrives.Columns.Add("Free Space", -2, HorizontalAlignment.Left);
+            lvDrives.Columns.Add("Free Space", -2, HorizontalAlignment.Left);       
 
             // Disallow changing width on ListView columns
             lvDrives.ColumnWidthChanging += (s, e) =>
@@ -226,7 +240,7 @@ namespace USBSoftwareLoader
         /// Detects removable drives and adds them to ListView.
         /// </summary>
         /// <param name="lView">ListView to populate.</param>
-        /// <param name="updateLog">Send update to status log.</param>
+        /// <param name="updateLog">Boolean choice to send update to status log.</param>
         private void PopulateListView(ListView lView, bool updateLog)
         {
             if (updateLog)            
@@ -296,6 +310,30 @@ namespace USBSoftwareLoader
                     throw new Exception("Target destination drive does not exist. Please try again.");
             }
         }
+
+        private string GetFullSoftwarePath(string partNumber)
+        {
+            string middle = partNumber.Substring(4, 5);
+            string softwareDir = VAULT_PATH;
+
+            switch (middle.Substring(0, 2))
+            {
+                case "91":
+                softwareDir += $@"\240-91XXX-XX\240-{middle}-XX\{partNumber}";
+                break;
+                case "92":
+                softwareDir += $@"\240-92XXX-XX\240-{middle}-XX\{partNumber}";
+                break;
+                case "93":
+                softwareDir += $@"\240-93XXX-XX\240-{middle}-XX\{partNumber}";
+                break;
+                case "94":
+                softwareDir += $@"\240-94XXX-XX\240-{middle}-XX\{partNumber}";
+                break;
+            }
+
+            return softwareDir;
+        }
         
         private void btnStartCopy_click(object sender, EventArgs e)
         {
@@ -303,10 +341,12 @@ namespace USBSoftwareLoader
             string softwareTopDir2 = "";
             var ECL1 = "";
             var ECL2 = "";
-            var softwarePartNumber = "";
+            var softwarePartNumber1 = "";
+            var softwarePartNumber2 = "";
             var softwareDir1 = "";
             var softwareDir2 = "";
-            PictureBox1.Image = USBSoftwareLoader.Properties.Resources.questionmark;
+            bool eraseUSB = true;
+            PictureBox1.Image = Properties.Resources.questionmark;
 
             if (!Directory.Exists(VAULT_PATH))
             {
@@ -314,58 +354,64 @@ namespace USBSoftwareLoader
                 return;
             }
 
+            // if CTRL is held while clicking the Copy button, the USB drive will not be erased before copying.
+            eraseUSB &= Control.ModifierKeys != Keys.Control;
+
             try
             {
-                // Get software dir based on what touchscreen version is selected, get ECL, and get full software dir
-                if (rbPitco.Checked)
+                string value;
+                if (AssemblyDict.TryGetValue(cboAssembly.Text, out value))
                 {
-                    softwareTopDir1 = VAULT_PATH + @"\240-91XXX-XX\240-91452-XX\240-91452-03";
-                    softwareTopDir2 = VAULT_PATH + @"\240-94XXX-XX\240-94452-XX\240-94452-99";
-                    ECL1 = GetECL("240-91452-03");
-                    ECL2 = GetECL("240-94452-99");
-                    softwarePartNumber = "Pitco 240-91452-03";
-                    softwareDir1 = $@"{softwareTopDir1}\ECL-{ECL1}";
+                    softwarePartNumber1 = value;
+                }
+
+                // if there are two softwares for that assembly, parse them
+                if (softwarePartNumber1.Contains(";"))
+                {
+                    softwarePartNumber2 = softwarePartNumber1.Substring(softwarePartNumber1.IndexOf(";") + 1);
+                    softwarePartNumber1 = softwarePartNumber1.Substring(0, softwarePartNumber1.IndexOf(";"));
+                    ECL2 = GetECL(softwarePartNumber2);
+                    softwareTopDir2 = GetFullSoftwarePath(softwarePartNumber2);
                     softwareDir2 = $@"{softwareTopDir2}\ECL-{ECL2}";
                 }
-                else if (rbVesta.Checked)
-                {
-                    softwareTopDir1 = VAULT_PATH + @"\240-91XXX-XX\240-91452-XX\240-91452-02";
-                    ECL1 = GetECL("240-91452-02");
-                    softwarePartNumber = "Vesta 240-91452-02";
-                    softwareDir1 = $@"{softwareTopDir1}\ECL-{ECL1}";
-                    softwareDir2 = "";
-                }
-                
-                var cp = new CopyParams(softwareDir1, softwareDir2, GetDestinationDirs(lvDrives), softwarePartNumber, ECL1);
+
+                ECL1 = GetECL(softwarePartNumber1);
+                softwareTopDir1 = GetFullSoftwarePath(softwarePartNumber1);
+                softwareDir1 = $@"{softwareTopDir1}\ECL-{ECL1}";
 
                 // Validate user input on UI
+                var cp = new CopyParams(softwareDir1, softwareDir2, GetDestinationDirs(lvDrives), softwarePartNumber1, ECL1, ECL2, eraseUSB);
                 ValidateCopyParams(cp.Source1, cp.Destinations);
 
                 // No exceptions, so continue....
                 Logger.Log("\nFinding latest software version...", rt);
-                Logger.Log("Latest software found: " + softwarePartNumber.Substring(6) + " ECL-" + ECL1, rt);
+                Logger.Log($@"Latest software found: {softwarePartNumber1} ECL-{ECL1}", rt);
 
                 // Show warning that drive will be erased
-                if (MessageBox.Show(new Form { TopMost = true }, "The selected USB drive will be erased!\nDo you wish to continue?",
-                    "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                if (eraseUSB)
                 {
-                    Logger.Log("Software loading operation cancelled.", rt, Color.Red);
-                    return;
+                    if (MessageBox.Show(new Form { TopMost = true }, "The selected USB drive will be erased!\nDo you wish to continue?",
+                                "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                    {
+                        Logger.Log("Software loading operation cancelled.", rt, Color.Red);
+                        return;
+                    } 
                 }
 
                 // Disable UI controls
-                DisableUI();                
+                DisableUI();
 
                 // Begin the copy in BackgroundWorker, pass CopyParams object into it
                 bw.RunWorkerAsync(cp);
             }
+
             catch (Exception ex)
             {
                 var logStr = $"Error: {ex.Message}";
                 Logger.Log(logStr, rt, Color.Red);
                 if (ex.Message.Contains("Target destination drive does not exist"))
                     PopulateListView(lvDrives, false);
-            }
+            }     
         }
 
         private void bw_DoWork(object sender, DoWorkEventArgs e)
@@ -374,7 +420,7 @@ namespace USBSoftwareLoader
 
             try
             {                
-                PerformCopy(cp.Source1, cp.Source2, cp.Destinations, cp.SoftwarePartNumber, cp.ECL);                
+                PerformCopy(cp.Source1, cp.Source2, cp.Destinations, cp.SoftwarePartNumber, cp.ECL1, cp.ECL2, cp.EraseUSB);                
             }
             catch (ArgumentException)
             {  // Catch user removal of drive during copy for RunWorkerCompleted to process
@@ -404,7 +450,7 @@ namespace USBSoftwareLoader
                 PopulateListView(lvDrives, false);
                 var logStr = $"An error has occured: {e.Error.Message}";
                 Logger.Log(logStr, rt, Color.Red);
-                MessageBox.Show("An error has occured: " + e.Error.Message, "USB Software Loader", MessageBoxButtons.OK);
+                MessageBox.Show($"An error has occured: {e.Error.Message}", "USB Software Loader", MessageBoxButtons.OK);
                 this.BringToFront();
                 this.Focus();
             }
@@ -413,7 +459,7 @@ namespace USBSoftwareLoader
                 // The operation completed normally.
                 PictureBox1.Image = Properties.Resources.check;
                 var cp = (CopyParams)e.Result;
-                var logStr = $"Software {cp.SoftwarePartNumber.Substring(6)} ECL-{cp.ECL} was successfully loaded!";
+                var logStr = $"Software {cp.SoftwarePartNumber} ECL-{cp.ECL1} was successfully loaded!";
                 Logger.Log(logStr, rt, Color.Green);                
             }
 
@@ -428,25 +474,35 @@ namespace USBSoftwareLoader
         /// <param name="sourceDir1"></param>
         /// <param name="sourceDir2"></param>
         /// <param name="destDirs"></param>
-        private void PerformCopy(string sourceDir1, string sourceDir2, List<string> destDirs, string softwarePartNumber, string ECL)
+        private void PerformCopy(string sourceDir1, string sourceDir2, List<string> destDirs, string softwarePartNumber, string ECL1, string ECL2, bool eraseUSB)
         {
             // Start copy execution
             for (int i = 0; i < destDirs.Count; i++)
             {
                 var dInfo = new DriveInfo(destDirs[i].Substring(0, 1));
                 // Set volume label
-                dInfo.VolumeLabel = $"{softwarePartNumber.Substring(10, 8)} {ECL}";
-                
-                // delete all files and directories of root dir on removable drive
-                ExecuteSecure(() => Logger.Log("\nErasing removable drive " + destDirs[i] + "...", rt));
-                DeleteDirContents(destDirs[i]);
+                dInfo.VolumeLabel = $"{softwarePartNumber.Substring(4, 8)} {ECL1}";
+
+                // if eraseUSB = true, delete all files and directories of root dir on removable drive
+                if (eraseUSB)
+                {
+                    ExecuteSecure(() => Logger.Log($"\nErasing removable drive {destDirs[i]}...", rt));
+                    DeleteDirContents(destDirs[i]); 
+                }
 
                 // Begin copying
-                ExecuteSecure(() => Logger.Log($"Starting to copy {softwarePartNumber} ECL-{ECL} to {destDirs[i]}...", rt));
+                ExecuteSecure(() => Logger.Log($"Starting to copy {softwarePartNumber} ECL-{ECL1} to {destDirs[i]}...", rt));
                 FileSystem.CopyDirectory(sourceDir1, destDirs[i], UIOption.AllDialogs, UICancelOption.ThrowException);
-                if (sourceDir2 != "")
+                if (!string.IsNullOrEmpty(sourceDir2))
+                {
                     FileSystem.CopyDirectory(sourceDir2, destDirs[i], UIOption.AllDialogs, UICancelOption.ThrowException);
-                FileSystem.CopyFile(FORCE_UPDATE_FILE, destDirs[i] + @"\force_update.txt", UIOption.AllDialogs, UICancelOption.ThrowException);
+                }
+
+                // copy force update file for Vesta 750 or Pitco 750
+                if (softwarePartNumber.Contains("91452"))
+                {
+                    FileSystem.CopyDirectory(FORCE_UPDATE_FILE, destDirs[i], UIOption.AllDialogs, UICancelOption.ThrowException); 
+                }
             }
         }
 
@@ -485,32 +541,82 @@ namespace USBSoftwareLoader
 
         private void btnCheckVersion_click(object sender, EventArgs e)
         {
-            string softwareVersion;
+            string softwareVersion = "";
+            string softwarePartNumber = "";
             if (!Directory.Exists(VAULT_PATH))
             {
                 Logger.Log(@"Error: Cannot find vault (V:\ drive).  Check network connection and try again.", rt, Color.Red);
                 return;
             }
+            
+            if (cboAssembly.Text == "")
+            {
+                Logger.Log(@"No assembly selected; cannot check software version.", rt, Color.Red);
+                return;
+            }            
 
             try
             {
-                // Get software ECL based on what radio button is checked
-                if (rbPitco.Checked)
+                string value;
+                if (AssemblyDict.TryGetValue(cboAssembly.Text, out value))
                 {
-                    softwareVersion = GetECL("240-91452-03");
-                    //var softwareVersion2 = GetECL("240-94452-99");
-                    Logger.Log($"Current released version of Pitco software 240-91452-03: ECL-{softwareVersion}", rt);
-                    //Logger.Log($"Current version of Pitco software 240-94452-99: ECL-{softwareVersion2}", rt);
+                    softwarePartNumber = value;
                 }
-                else if (rbVesta.Checked)
+
+                if (softwarePartNumber.Contains(";"))
                 {
-                    softwareVersion = GetECL("240-91452-02");
-                    Logger.Log($"Current released version of Vesta software 240-91452-02: ECL-{softwareVersion}", rt);
+                    softwarePartNumber = softwarePartNumber.Substring(0, softwarePartNumber.IndexOf(";"));
                 }
+
+                softwareVersion = GetECL(softwarePartNumber);
+                Logger.Log($@"Current released version of software {softwarePartNumber}: ECL-{softwareVersion}", rt);              
             }
             catch
             {
 
+            }
+        }
+
+        /// <summary>
+        /// Reads the text file containing assemblies and software pairs into a dictionary.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private Dictionary<string, string> ReadSoftwareFileToDict(string path)
+        {
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+            string line;
+            using (var reader = new StreamReader(path))
+            {
+                // Read the file and display it line by line.  
+                while ((line = reader.ReadLine()?.Trim()) != null)
+                {
+                    if (line.StartsWith("#") || line.StartsWith("//") || line == string.Empty)  //Ignore comments and empty lines
+                    {
+                        continue;
+                    }
+                    try
+                    {
+                        var assembly = line.Substring(0, line.IndexOf(","));
+                        var software = line.Substring(line.IndexOf(",") + 1);
+                        dict.Add(assembly, software);
+                    }
+                    catch (Exception)
+                    {
+                        Logger.Log("Error reading Assembly / Software part number file.", rt, Color.Red);
+                    }
+                }
+            }            
+
+            return dict;
+        }
+
+        private void cboAssembly_SelectedValueChanged(object sender, EventArgs e)
+        {
+            string value;
+            if (AssemblyDict.TryGetValue(cboAssembly.Text, out value))
+            {
+                lblSoftware.Text = value;
             }
         }
     }
