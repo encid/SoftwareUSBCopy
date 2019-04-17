@@ -26,7 +26,7 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ProductName>USB Software Loader</ProductName>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.7.1.0</ApplicationVersion>
+    <ApplicationVersion>1.8.0.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -126,9 +126,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="files\force_update.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SoftwarePartNumbers.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="files\.force_update.txt">

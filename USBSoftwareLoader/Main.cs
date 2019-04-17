@@ -2,7 +2,6 @@
  * 
  * USB Software Loader
  * Designed by R. Cavallaro
- * Last update: 3/20/19
  * 
  */
 
@@ -15,15 +14,14 @@ using System.Linq;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Configuration;
+using System.Collections.Specialized;
 
 namespace USBSoftwareLoader
 {
     public partial class Main : Form
     {
         public string VAULT_PATH = ConfigurationManager.AppSettings["VAULT_PATH"];
-        public string CALIBRATION_FILE = Application.StartupPath + ConfigurationManager.AppSettings["CALIBRATION_FILE"];
         public string FORCE_UPDATE_FILE = Application.StartupPath + ConfigurationManager.AppSettings["FORCE_UPDATE_FILE"];
-        public string ASSEMBLY_SOFTWARE_FILE = Application.StartupPath + ConfigurationManager.AppSettings["ASSEMBLY_SOFTWARE_FILE"];
         public int currDriveCount { get; set; }
         public Dictionary<string, string> AssemblyDict = new Dictionary<string, string>();
         BackgroundWorker bw;
@@ -56,22 +54,30 @@ namespace USBSoftwareLoader
             InitializeComponent();
             InitializeEventHandlers();
 
+            // import list of assembly/software from config file to dict
+            //if (ReadSoftwareSettingsToDict() != null)
+            //{
+                AssemblyDict = ReadSoftwareSettingsToDict();
+            //}            
+
+            // Populate combobox of assemblies
+            if (AssemblyDict.Count > 0)
+            {
+                foreach (var x in AssemblyDict)
+                {
+                    cboAssembly.Items.Add(x.Key);
+                }
+
+                cboAssembly.SelectedIndex = 0;
+            }
+
             Logger.Log($"Kitchen Brains USB Software Loader version: {ProductVersion}", rt);
+            Logger.Log($"Imported {cboAssembly.Items.Count} software part numbers.", rt);
 
             // Add (destination) removable drives to ListView
             PopulateListView(lvDrives, true);
 
             currDriveCount = lvDrives.Items.Count;
-
-            AssemblyDict = ReadSoftwareFileToDict(ASSEMBLY_SOFTWARE_FILE);
-
-            // Populate combobox of assemblies
-            foreach (var x in AssemblyDict)
-            {
-                cboAssembly.Items.Add(x.Key);
-            }
-
-            cboAssembly.SelectedIndex = 0;
         }
 
         public void InitializeEventHandlers()
@@ -124,6 +130,19 @@ namespace USBSoftwareLoader
                 if (rt.Visible)
                     rt.ScrollToCaret();
             };
+        }
+
+        private void Main_Load(object sender, EventArgs e)
+        {
+            //set default config values if paths are null or empty (config file didn't load)
+            if (string.IsNullOrEmpty(VAULT_PATH))
+            {
+                VAULT_PATH = @"\\pandora\vault";
+            }
+            if (string.IsNullOrEmpty(FORCE_UPDATE_FILE))
+            {
+                FORCE_UPDATE_FILE = Application.StartupPath + @"\files";
+            }
         }
 
         /// <summary>
@@ -214,14 +233,14 @@ namespace USBSoftwareLoader
                     swDir = @"\240-94XXX-XX\";
                 }
 
-                var softwareDir = (from sd in Directory.GetDirectories($@"{VAULT_PATH}\{swDir}\240-{softwarePartOne}-XX\")
-                                   where sd.Contains(softwarePartNumber)
-                                   select sd)
+                var softwareDir = (from dir in Directory.GetDirectories($@"{VAULT_PATH}\Released_Part_Information\240-XXXXX-XX_SOFTWARE\240-9XXXX-XX\{swDir}\240-{softwarePartOne}-XX\")
+                                   where dir.Contains(softwarePartNumber)
+                                   select dir)
                                   .FirstOrDefault();
 
-                var eclDir = (from ed in Directory.GetDirectories(softwareDir)
-                              where ed.Contains("ECL")
-                              select ed)
+                var eclDir = (from dir in Directory.GetDirectories(softwareDir)
+                              where dir.Contains("ECL")
+                              select dir)
                              .FirstOrDefault();
 
                 tempECLStr = eclDir.Substring(eclDir.Length - 6);
@@ -314,21 +333,21 @@ namespace USBSoftwareLoader
         private string GetFullSoftwarePath(string partNumber)
         {
             string middle = partNumber.Substring(4, 5);
-            string softwareDir = VAULT_PATH;
+            string softwareDir = "";
 
             switch (middle.Substring(0, 2))
             {
                 case "91":
-                softwareDir += $@"\240-91XXX-XX\240-{middle}-XX\{partNumber}";
+                softwareDir += $@"{VAULT_PATH}\Released_Part_Information\240-XXXXX-XX_SOFTWARE\240-9XXXX-XX\240-91XXX-XX\240-{middle}-XX\{partNumber}";
                 break;
                 case "92":
-                softwareDir += $@"\240-92XXX-XX\240-{middle}-XX\{partNumber}";
+                softwareDir += $@"{VAULT_PATH}\Released_Part_Information\240-XXXXX-XX_SOFTWARE\240-9XXXX-XX\240-92XXX-XX\240-{middle}-XX\{partNumber}";
                 break;
                 case "93":
-                softwareDir += $@"\240-93XXX-XX\240-{middle}-XX\{partNumber}";
+                softwareDir += $@"{VAULT_PATH}\Released_Part_Information\240-XXXXX-XX_SOFTWARE\240-9XXXX-XX\240-93XXX-XX\240-{middle}-XX\{partNumber}";
                 break;
                 case "94":
-                softwareDir += $@"\240-94XXX-XX\240-{middle}-XX\{partNumber}";
+                softwareDir += $@"{VAULT_PATH}\Released_Part_Information\240-XXXXX-XX_SOFTWARE\240-9XXXX-XX\240-94XXX-XX\240-{middle}-XX\{partNumber}";
                 break;
             }
 
@@ -351,6 +370,12 @@ namespace USBSoftwareLoader
             if (!Directory.Exists(VAULT_PATH))
             {
                 Logger.Log(@"Error: Cannot find vault (V:\ drive).  Check network connection and try again.", rt, Color.Red);
+                return;
+            }
+
+            if (cboAssembly.Items.Count == 0)
+            {
+                Logger.Log(@"Error: No software part numbers found.  Check config file.", rt, Color.Red);
                 return;
             }
 
@@ -384,14 +409,14 @@ namespace USBSoftwareLoader
                 ValidateCopyParams(cp.Source1, cp.Destinations);
 
                 // No exceptions, so continue....
-                Logger.Log("\nFinding latest software version...", rt);
                 Logger.Log($@"Latest software found: {softwarePartNumber1} ECL-{ECL1}", rt);
 
                 // Show warning that drive will be erased
                 if (eraseUSB)
                 {
                     if (MessageBox.Show(new Form { TopMost = true }, "The selected USB drive will be erased!\nDo you wish to continue?",
-                                "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                                                                     "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) 
+                                                                     == DialogResult.No)
                     {
                         Logger.Log("Software loading operation cancelled.", rt, Color.Red);
                         return;
@@ -571,42 +596,37 @@ namespace USBSoftwareLoader
                 softwareVersion = GetECL(softwarePartNumber);
                 Logger.Log($@"Current released version of software {softwarePartNumber}: ECL-{softwareVersion}", rt);              
             }
-            catch
+            catch (Exception ex)
             {
-
+                Logger.Log($@"Error checking software version: {ex.Message}", rt);
             }
         }
-
+        
         /// <summary>
-        /// Reads the text file containing assemblies and software pairs into a dictionary.
+        /// Reads assembly/software part numbers from the config file into a dict
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        private Dictionary<string, string> ReadSoftwareFileToDict(string path)
+        /// <returns>dict</returns>
+        private Dictionary<string,string> ReadSoftwareSettingsToDict()
         {
-            Dictionary<string, string> dict = new Dictionary<string, string>();
-            string line;
-            using (var reader = new StreamReader(path))
+            Dictionary<string, string> dict = new Dictionary<string, string>();            
+
+            try
             {
-                // Read the file and display it line by line.  
-                while ((line = reader.ReadLine()?.Trim()) != null)
+                NameValueCollection section = (NameValueCollection)ConfigurationManager.GetSection("SoftwarePartNumbers");
+
+                // if software settings section doesn't exist or has no software in it, return empty dict
+                if ((section == null) || (section.Count == 0)) return dict;
+
+                foreach (string key in section.AllKeys)
                 {
-                    if (line.StartsWith("#") || line.StartsWith("//") || line == string.Empty)  //Ignore comments and empty lines
-                    {
-                        continue;
-                    }
-                    try
-                    {
-                        var assembly = line.Substring(0, line.IndexOf(","));
-                        var software = line.Substring(line.IndexOf(",") + 1);
-                        dict.Add(assembly, software);
-                    }
-                    catch (Exception)
-                    {
-                        Logger.Log("Error reading Assembly / Software part number file.", rt, Color.Red);
-                    }
+                    var value = section[key];
+                    dict.Add(key, value);
                 }
-            }            
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Error loading software part numbers: {e.Message}", rt, Color.Red);
+            }
 
             return dict;
         }
@@ -618,6 +638,6 @@ namespace USBSoftwareLoader
             {
                 lblSoftware.Text = value;
             }
-        }
+        }        
     }
 }

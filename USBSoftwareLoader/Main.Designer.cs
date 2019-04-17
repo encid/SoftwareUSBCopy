@@ -55,7 +55,7 @@
             this.lvDrives.Name = "lvDrives";
             this.lvDrives.ShowGroups = false;
             this.lvDrives.Size = new System.Drawing.Size(425, 159);
-            this.lvDrives.TabIndex = 0;
+            this.lvDrives.TabIndex = 1;
             this.lvDrives.UseCompatibleStateImageBehavior = false;
             this.lvDrives.View = System.Windows.Forms.View.Details;
             // 
@@ -66,7 +66,7 @@
             this.btnStartCopy.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnStartCopy.Name = "btnStartCopy";
             this.btnStartCopy.Size = new System.Drawing.Size(125, 40);
-            this.btnStartCopy.TabIndex = 1;
+            this.btnStartCopy.TabIndex = 4;
             this.btnStartCopy.Text = "Load Software";
             this.btnStartCopy.UseVisualStyleBackColor = true;
             this.btnStartCopy.Click += new System.EventHandler(this.btnStartCopy_click);
@@ -82,7 +82,7 @@
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox1.Size = new System.Drawing.Size(198, 106);
-            this.groupBox1.TabIndex = 3;
+            this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Assembly Part Number";
             // 
@@ -94,7 +94,7 @@
             this.cboAssembly.Location = new System.Drawing.Point(28, 33);
             this.cboAssembly.Name = "cboAssembly";
             this.cboAssembly.Size = new System.Drawing.Size(147, 25);
-            this.cboAssembly.TabIndex = 4;
+            this.cboAssembly.TabIndex = 2;
             this.cboAssembly.SelectedIndexChanged += new System.EventHandler(this.cboAssembly_SelectedValueChanged);
             // 
             // lblSw
@@ -126,7 +126,8 @@
             this.rt.ReadOnly = true;
             this.rt.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
             this.rt.Size = new System.Drawing.Size(498, 172);
-            this.rt.TabIndex = 2;
+            this.rt.TabIndex = 41;
+            this.rt.TabStop = false;
             this.rt.Text = "";
             // 
             // label1
@@ -137,9 +138,9 @@
             this.label1.Location = new System.Drawing.Point(507, 306);
             this.label1.MaximumSize = new System.Drawing.Size(126, 70);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(126, 32);
+            this.label1.Size = new System.Drawing.Size(120, 32);
             this.label1.TabIndex = 5;
-            this.label1.Text = "Version: 1.7.1                 3/20/19  11:06";
+            this.label1.Text = "Version: 1.8                 4/17/19  09:25";
             // 
             // PictureBox1
             // 
@@ -161,7 +162,7 @@
             this.btnCheckVersion.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnCheckVersion.Name = "btnCheckVersion";
             this.btnCheckVersion.Size = new System.Drawing.Size(125, 40);
-            this.btnCheckVersion.TabIndex = 6;
+            this.btnCheckVersion.TabIndex = 3;
             this.btnCheckVersion.Text = "Check Vault for Latest S/W Version";
             this.btnCheckVersion.UseVisualStyleBackColor = true;
             this.btnCheckVersion.Click += new System.EventHandler(this.btnCheckVersion_click);
@@ -187,6 +188,7 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Kitchen Brains USB Software Loader";
+            this.Load += new System.EventHandler(this.Main_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox1)).EndInit();
