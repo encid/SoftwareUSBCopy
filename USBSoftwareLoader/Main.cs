@@ -24,6 +24,7 @@ namespace USBSoftwareLoader
         public string FORCE_UPDATE_FILE = Application.StartupPath + ConfigurationManager.AppSettings["FORCE_UPDATE_FILE"];
         public int currDriveCount { get; set; }
         public Dictionary<string, string> AssemblyDict = new Dictionary<string, string>();
+        public Dictionary<string, string> DescriptionDict = new Dictionary<string, string>();
         BackgroundWorker bw;
         Timer tmrRefresh = new Timer();
         
@@ -33,19 +34,19 @@ namespace USBSoftwareLoader
             public string Source2 { get; set; }
             public List<string> Destinations { get; set; }
             public string SoftwarePartNumber { get; set; }
-            public string ECL1 { get; set; }
-            public string ECL2 { get; set; }
-            public bool EraseUSB { get; set; }
+            public string Ecl1 { get; set; }
+            public string Ecl2 { get; set; }
+            public bool EraseUsb { get; set; }
 
-            public CopyParams(string source1, string source2, List<string> destinations, string softwarepartnumber, string ecl1, string ecl2, bool eraseusb)
+            public CopyParams(string _Source1, string _Source2, List<string> _Destinations, string _SoftwarePartNumber, string _Ecl1, string _Ecl2, bool _EraseUsb)
             {
-                ECL1 = ecl1;
-                ECL2 = ecl2;
-                SoftwarePartNumber = softwarepartnumber;
-                Source1 = source1;
-                Source2 = source2;
-                Destinations = destinations;
-                EraseUSB = eraseusb;
+                Ecl1 = _Ecl1;
+                Ecl2 = _Ecl2;
+                SoftwarePartNumber = _SoftwarePartNumber;
+                Source1 = _Source1;
+                Source2 = _Source2;
+                Destinations = _Destinations;
+                EraseUsb = _EraseUsb;
             }
         }
 
@@ -57,7 +58,8 @@ namespace USBSoftwareLoader
             // import list of assembly/software from config file to dict
             //if (ReadSoftwareSettingsToDict() != null)
             //{
-                AssemblyDict = ReadSoftwareSettingsToDict();
+            AssemblyDict = ReadSoftwareSettingsToDict();
+            DescriptionDict = ReadSoftwareDescriptionsToDict();
             //}            
 
             // Populate combobox of assemblies
@@ -445,7 +447,7 @@ namespace USBSoftwareLoader
 
             try
             {                
-                PerformCopy(cp.Source1, cp.Source2, cp.Destinations, cp.SoftwarePartNumber, cp.ECL1, cp.ECL2, cp.EraseUSB);                
+                PerformCopy(cp.Source1, cp.Source2, cp.Destinations, cp.SoftwarePartNumber, cp.Ecl1, cp.Ecl2, cp.EraseUsb);                
             }
             catch (ArgumentException)
             {  // Catch user removal of drive during copy for RunWorkerCompleted to process
@@ -484,7 +486,7 @@ namespace USBSoftwareLoader
                 // The operation completed normally.
                 PictureBox1.Image = Properties.Resources.check;
                 var cp = (CopyParams)e.Result;
-                var logStr = $"Software {cp.SoftwarePartNumber} ECL-{cp.ECL1} was successfully loaded!";
+                var logStr = $"Software {cp.SoftwarePartNumber} ECL-{cp.Ecl1} was successfully loaded!";
                 Logger.Log(logStr, rt, Color.Green);                
             }
 
@@ -631,12 +633,47 @@ namespace USBSoftwareLoader
             return dict;
         }
 
+        private Dictionary<string, string> ReadSoftwareDescriptionsToDict()
+        {
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+
+            try
+            {
+                NameValueCollection section = (NameValueCollection)ConfigurationManager.GetSection("SoftwareDescriptions");
+
+                // if software settings section doesn't exist or has no software in it, return empty dict
+                if ((section == null) || (section.Count == 0)) return dict;
+
+                foreach (string key in section.AllKeys)
+                {
+                    var value = section[key];
+                    dict.Add(key, value);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Error loading software descriptions: {e.Message}", rt, Color.Red);
+            }
+
+            return dict;
+        }
+
         private void cboAssembly_SelectedValueChanged(object sender, EventArgs e)
         {
-            string value;
-            if (AssemblyDict.TryGetValue(cboAssembly.Text, out value))
+            string software;
+            string description;
+            if (AssemblyDict.TryGetValue(cboAssembly.Text, out software))
             {
-                lblSoftware.Text = value;
+                if (software.Contains(";"))
+                {
+                    software = software.Substring(0, software.IndexOf(";"));
+                }
+                lblSoftware.Text = software;
+            }
+
+            if (DescriptionDict.TryGetValue(cboAssembly.Text, out description))
+            {
+                lblDescription.Text = description;
             }
         }        
     }

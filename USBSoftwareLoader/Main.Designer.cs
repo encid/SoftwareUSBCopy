@@ -32,6 +32,8 @@
             this.lvDrives = new System.Windows.Forms.ListView();
             this.btnStartCopy = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.lblDescription = new System.Windows.Forms.Label();
+            this.lblDesc = new System.Windows.Forms.Label();
             this.cboAssembly = new System.Windows.Forms.ComboBox();
             this.lblSw = new System.Windows.Forms.Label();
             this.lblSoftware = new System.Windows.Forms.Label();
@@ -54,7 +56,7 @@
             this.lvDrives.MultiSelect = false;
             this.lvDrives.Name = "lvDrives";
             this.lvDrives.ShowGroups = false;
-            this.lvDrives.Size = new System.Drawing.Size(425, 159);
+            this.lvDrives.Size = new System.Drawing.Size(425, 178);
             this.lvDrives.TabIndex = 1;
             this.lvDrives.UseCompatibleStateImageBehavior = false;
             this.lvDrives.View = System.Windows.Forms.View.Details;
@@ -62,7 +64,8 @@
             // btnStartCopy
             // 
             this.btnStartCopy.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnStartCopy.Location = new System.Drawing.Point(507, 168);
+            this.btnStartCopy.ForeColor = System.Drawing.Color.Navy;
+            this.btnStartCopy.Location = new System.Drawing.Point(507, 179);
             this.btnStartCopy.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnStartCopy.Name = "btnStartCopy";
             this.btnStartCopy.Size = new System.Drawing.Size(125, 40);
@@ -73,6 +76,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.lblDescription);
+            this.groupBox1.Controls.Add(this.lblDesc);
             this.groupBox1.Controls.Add(this.cboAssembly);
             this.groupBox1.Controls.Add(this.lblSw);
             this.groupBox1.Controls.Add(this.lblSoftware);
@@ -81,19 +86,38 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox1.Size = new System.Drawing.Size(198, 106);
+            this.groupBox1.Size = new System.Drawing.Size(198, 118);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Assembly Part Number";
+            // 
+            // lblDescription
+            // 
+            this.lblDescription.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDescription.Location = new System.Drawing.Point(52, 82);
+            this.lblDescription.Name = "lblDescription";
+            this.lblDescription.Size = new System.Drawing.Size(137, 17);
+            this.lblDescription.TabIndex = 5;
+            this.lblDescription.Text = "                         ";
+            // 
+            // lblDesc
+            // 
+            this.lblDesc.AutoSize = true;
+            this.lblDesc.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDesc.Location = new System.Drawing.Point(12, 82);
+            this.lblDesc.Name = "lblDesc";
+            this.lblDesc.Size = new System.Drawing.Size(39, 17);
+            this.lblDesc.TabIndex = 4;
+            this.lblDesc.Text = "Desc:";
             // 
             // cboAssembly
             // 
             this.cboAssembly.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboAssembly.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboAssembly.FormattingEnabled = true;
-            this.cboAssembly.Location = new System.Drawing.Point(28, 33);
+            this.cboAssembly.Location = new System.Drawing.Point(15, 28);
             this.cboAssembly.Name = "cboAssembly";
-            this.cboAssembly.Size = new System.Drawing.Size(147, 25);
+            this.cboAssembly.Size = new System.Drawing.Size(164, 25);
             this.cboAssembly.TabIndex = 2;
             this.cboAssembly.SelectedIndexChanged += new System.EventHandler(this.cboAssembly_SelectedValueChanged);
             // 
@@ -101,7 +125,7 @@
             // 
             this.lblSw.AutoSize = true;
             this.lblSw.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSw.Location = new System.Drawing.Point(25, 71);
+            this.lblSw.Location = new System.Drawing.Point(12, 65);
             this.lblSw.Name = "lblSw";
             this.lblSw.Size = new System.Drawing.Size(62, 17);
             this.lblSw.TabIndex = 2;
@@ -110,9 +134,9 @@
             // lblSoftware
             // 
             this.lblSoftware.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSoftware.Location = new System.Drawing.Point(87, 71);
+            this.lblSoftware.Location = new System.Drawing.Point(75, 65);
             this.lblSoftware.Name = "lblSoftware";
-            this.lblSoftware.Size = new System.Drawing.Size(88, 17);
+            this.lblSoftware.Size = new System.Drawing.Size(114, 17);
             this.lblSoftware.TabIndex = 3;
             this.lblSoftware.Text = "                         ";
             // 
@@ -120,7 +144,7 @@
             // 
             this.rt.BackColor = System.Drawing.Color.WhiteSmoke;
             this.rt.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rt.Location = new System.Drawing.Point(3, 172);
+            this.rt.Location = new System.Drawing.Point(3, 191);
             this.rt.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.rt.Name = "rt";
             this.rt.ReadOnly = true;
@@ -135,19 +159,19 @@
             this.label1.AutoSize = true;
             this.label1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(507, 306);
+            this.label1.Location = new System.Drawing.Point(507, 325);
             this.label1.MaximumSize = new System.Drawing.Size(126, 70);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(120, 32);
+            this.label1.Size = new System.Drawing.Size(126, 32);
             this.label1.TabIndex = 5;
-            this.label1.Text = "Version: 1.8                 4/17/19  09:25";
+            this.label1.Text = "Version: 1.8.1                 5/7/19  09:25";
             // 
             // PictureBox1
             // 
             this.PictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.PictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.PictureBox1.Image = global::USBSoftwareLoader.Properties.Resources.questionmark;
-            this.PictureBox1.Location = new System.Drawing.Point(526, 212);
+            this.PictureBox1.Location = new System.Drawing.Point(526, 231);
             this.PictureBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.PictureBox1.Name = "PictureBox1";
             this.PictureBox1.Size = new System.Drawing.Size(90, 90);
@@ -157,13 +181,13 @@
             // 
             // btnCheckVersion
             // 
-            this.btnCheckVersion.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCheckVersion.Location = new System.Drawing.Point(507, 124);
+            this.btnCheckVersion.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCheckVersion.Location = new System.Drawing.Point(507, 131);
             this.btnCheckVersion.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnCheckVersion.Name = "btnCheckVersion";
             this.btnCheckVersion.Size = new System.Drawing.Size(125, 40);
             this.btnCheckVersion.TabIndex = 3;
-            this.btnCheckVersion.Text = "Check Vault for Latest S/W Version";
+            this.btnCheckVersion.Text = "Check ECL";
             this.btnCheckVersion.UseVisualStyleBackColor = true;
             this.btnCheckVersion.Click += new System.EventHandler(this.btnCheckVersion_click);
             // 
@@ -171,7 +195,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(635, 347);
+            this.ClientSize = new System.Drawing.Size(635, 366);
             this.Controls.Add(this.btnCheckVersion);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.rt);
@@ -209,6 +233,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnCheckVersion;
         private System.Windows.Forms.ComboBox cboAssembly;
+        private System.Windows.Forms.Label lblDescription;
+        private System.Windows.Forms.Label lblDesc;
     }
 }
 
