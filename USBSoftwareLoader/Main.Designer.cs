@@ -103,10 +103,10 @@
             // lblDesc
             // 
             this.lblDesc.AutoSize = true;
-            this.lblDesc.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDesc.Location = new System.Drawing.Point(12, 82);
+            this.lblDesc.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDesc.Location = new System.Drawing.Point(13, 84);
             this.lblDesc.Name = "lblDesc";
-            this.lblDesc.Size = new System.Drawing.Size(39, 17);
+            this.lblDesc.Size = new System.Drawing.Size(35, 15);
             this.lblDesc.TabIndex = 4;
             this.lblDesc.Text = "Desc:";
             // 
@@ -124,10 +124,10 @@
             // lblSw
             // 
             this.lblSw.AutoSize = true;
-            this.lblSw.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSw.Location = new System.Drawing.Point(12, 65);
+            this.lblSw.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSw.Location = new System.Drawing.Point(13, 67);
             this.lblSw.Name = "lblSw";
-            this.lblSw.Size = new System.Drawing.Size(62, 17);
+            this.lblSw.Size = new System.Drawing.Size(56, 15);
             this.lblSw.TabIndex = 2;
             this.lblSw.Text = "Software:";
             // 
@@ -162,9 +162,9 @@
             this.label1.Location = new System.Drawing.Point(507, 325);
             this.label1.MaximumSize = new System.Drawing.Size(126, 70);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(126, 32);
+            this.label1.Size = new System.Drawing.Size(117, 32);
             this.label1.TabIndex = 5;
-            this.label1.Text = "Version: 1.8.1                 5/7/19  09:25";
+            this.label1.Text = "Version: 1.9                8/7/19  08:40";
             // 
             // PictureBox1
             // 
