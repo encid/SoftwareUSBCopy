@@ -51,6 +51,7 @@
             this.lvDrives.CheckBoxes = true;
             this.lvDrives.FullRowSelect = true;
             this.lvDrives.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.lvDrives.HideSelection = false;
             this.lvDrives.Location = new System.Drawing.Point(3, 5);
             this.lvDrives.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.lvDrives.MultiSelect = false;
@@ -162,9 +163,9 @@
             this.label1.Location = new System.Drawing.Point(507, 325);
             this.label1.MaximumSize = new System.Drawing.Size(126, 70);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(117, 32);
+            this.label1.Size = new System.Drawing.Size(122, 32);
             this.label1.TabIndex = 5;
-            this.label1.Text = "Version: 1.9                8/7/19  08:40";
+            this.label1.Text = "Version: 1.91                3/4/20  08:00";
             // 
             // PictureBox1
             // 

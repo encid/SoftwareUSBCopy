@@ -6,6 +6,7 @@ using System.Data.Entity.Design.PluralizationServices;
 using System.Globalization;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace USBSoftwareLoader
 {

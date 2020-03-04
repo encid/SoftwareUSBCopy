@@ -22,6 +22,7 @@ namespace USBSoftwareLoader
     {
         public string VAULT_PATH = ConfigurationManager.AppSettings["VAULT_PATH"];
         public string FORCE_UPDATE_FILE = Application.StartupPath + ConfigurationManager.AppSettings["FORCE_UPDATE_FILE"];
+        public string INI_FILE = ConfigurationManager.AppSettings["INI_FILE"];
         public int CurrDriveCount { get; set; }
         public Dictionary<string, string> AssemblyDict = new Dictionary<string, string>();
         public Dictionary<string, string> DescriptionDict = new Dictionary<string, string>();
@@ -279,11 +280,11 @@ namespace USBSoftwareLoader
                 return;
             }
 
-            string driveNames = "";
+            List<string> driveNames = new List<string>();
             // Iterate through collection and add each removable drive as to ListView as items and subitems
             foreach (var drive in drives)
             {
-                driveNames += drive.Name + ", ";
+                driveNames.Add(drive.Name);
                 var freeSpace = BytesToString(drive.TotalFreeSpace);
                 var totalSpace = BytesToString(drive.TotalSize);
                 var oItem = new ListViewItem
@@ -299,10 +300,9 @@ namespace USBSoftwareLoader
             }
 
             // Get count and names of drives found and log it to status
-            driveNames = driveNames.Substring(0, driveNames.Length - 2);
             if (updateLog)
             {
-                var logStr = $"Detected {drives.Count()} removable {"drive".Pluralize(drives.Count())}: {driveNames}";
+                var logStr = $"Detected {drives.Count()} removable {"drive".Pluralize(drives.Count())}: {string.Join(", ", driveNames)}";
                 Logger.Log(logStr, rt);
             }
         }
@@ -608,24 +608,48 @@ namespace USBSoftwareLoader
         /// <returns>dict</returns>
         private Dictionary<string,string> ReadSoftwareSettingsToDict()
         {
+            //Dictionary<string, string> dict = new Dictionary<string, string>();
+
+            //try
+            //{
+            //    NameValueCollection section = (NameValueCollection)ConfigurationManager.GetSection("SoftwarePartNumbers");
+
+            //    // if software settings section doesn't exist or has no software in it, return empty dict
+            //    if ((section == null) || (section.Count == 0)) return dict;
+
+            //    foreach (string key in section.AllKeys)
+            //    {
+            //        var value = section[key];
+            //        dict.Add(key, value);
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    Logger.Log($"Error loading software part numbers: {e.Message}", rt, Color.Red);
+            //}
+
+            //return dict;
+
             Dictionary<string, string> dict = new Dictionary<string, string>();
 
             try
             {
-                NameValueCollection section = (NameValueCollection)ConfigurationManager.GetSection("SoftwarePartNumbers");
+                var fs = new FileStream(INI_FILE, FileMode.Open, FileAccess.Read);
 
-                // if software settings section doesn't exist or has no software in it, return empty dict
-                if ((section == null) || (section.Count == 0)) return dict;
-
-                foreach (string key in section.AllKeys)
+                using (StreamReader sr = new StreamReader(fs))
                 {
-                    var value = section[key];
-                    dict.Add(key, value);
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        string[] parts = line.Split(',');
+                        dict.Add(parts[0], parts[2]);
+                    }
+
                 }
             }
             catch (Exception e)
             {
-                Logger.Log($"Error loading software part numbers: {e.Message}", rt, Color.Red);
+                Logger.Log($"Error loading software descriptions: {e.Message}", rt, Color.Red);
             }
 
             return dict;
@@ -633,19 +657,42 @@ namespace USBSoftwareLoader
 
         private Dictionary<string, string> ReadSoftwareDescriptionsToDict()
         {
+            //Dictionary<string, string> dict = new Dictionary<string, string>();
+
+            //try
+            //{
+            //    NameValueCollection section = (NameValueCollection)ConfigurationManager.GetSection("SoftwareDescriptions");
+
+            //    // if software settings section doesn't exist or has no software in it, return empty dict
+            //    if ((section == null) || (section.Count == 0)) return dict;
+
+            //    foreach (string key in section.AllKeys)
+            //    {
+            //        var value = section[key];
+            //        dict.Add(key, value);
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    Logger.Log($"Error loading software descriptions: {e.Message}", rt, Color.Red);
+            //}
+
+            //return dict;
+
             Dictionary<string, string> dict = new Dictionary<string, string>();
 
             try
             {
-                NameValueCollection section = (NameValueCollection)ConfigurationManager.GetSection("SoftwareDescriptions");
+                var fs = new FileStream(INI_FILE, FileMode.Open, FileAccess.Read);
 
-                // if software settings section doesn't exist or has no software in it, return empty dict
-                if ((section == null) || (section.Count == 0)) return dict;
-
-                foreach (string key in section.AllKeys)
+                using (StreamReader sr = new StreamReader(fs))
                 {
-                    var value = section[key];
-                    dict.Add(key, value);
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        string[] parts = line.Split(',');
+                        dict.Add(parts[0], parts[1]);
+                    }
                 }
             }
             catch (Exception e)
