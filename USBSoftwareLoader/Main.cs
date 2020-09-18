@@ -146,6 +146,10 @@ namespace USBSoftwareLoader
             {
                 FORCE_UPDATE_FILE = Application.StartupPath + @"\files";
             }
+            if (string.IsNullOrEmpty(INI_FILE))
+            {
+                INI_FILE = @"\\kb-fp02\shared\Operations\Test Engineering\Test Softwares\USB Software Loader\software.ini";
+            }
         }
 
         /// <summary>
@@ -390,8 +394,15 @@ namespace USBSoftwareLoader
                 // if there are two softwares for that assembly, parse them
                 if (softwarePartNumber1.Contains(";"))
                 {
-                    string softwarePartNumber2 = softwarePartNumber1.Substring(softwarePartNumber1.IndexOf(";") + 1);
-                    softwarePartNumber1 = softwarePartNumber1.Substring(0, softwarePartNumber1.IndexOf(";"));
+                    //string softwarePartNumber2 = softwarePartNumber1.Substring(softwarePartNumber1.IndexOf(";") + 1);
+                    //softwarePartNumber1 = softwarePartNumber1.Substring(0, softwarePartNumber1.IndexOf(";"));
+                    //ECL2 = GetECL(softwarePartNumber2);
+                    //string softwareTopDir2 = GetFullSoftwarePath(softwarePartNumber2);
+                    //softwareDir2 = $@"{softwareTopDir2}\ECL-{ECL2}";
+
+                    string[] SoftwarePartNums = softwarePartNumber1.Split(';');
+                    softwarePartNumber1 = SoftwarePartNums[0];
+                    string softwarePartNumber2 = SoftwarePartNums[1];
                     ECL2 = GetECL(softwarePartNumber2);
                     string softwareTopDir2 = GetFullSoftwarePath(softwarePartNumber2);
                     softwareDir2 = $@"{softwareTopDir2}\ECL-{ECL2}";
@@ -603,7 +614,8 @@ namespace USBSoftwareLoader
         }
 
         /// <summary>
-        /// Reads assembly/software part numbers from the config file into a dict
+        /// Reads assembly/software part numbers from the config file into a dict.
+        /// Ignores lines that start with "#"
         /// </summary>
         /// <returns>dict</returns>
         private Dictionary<string,string> ReadSoftwareSettingsToDict()
@@ -641,15 +653,17 @@ namespace USBSoftwareLoader
                     string line;
                     while ((line = sr.ReadLine()) != null)
                     {
-                        string[] parts = line.Split(',');
-                        dict.Add(parts[0], parts[2]);
+                        if (!line.StartsWith(@"#"))   // ignore comment lines
+                        {
+                            string[] parts = line.Split(',');
+                            dict.Add(parts[0], parts[2]);
+                        }
                     }
-
                 }
             }
             catch (Exception e)
             {
-                Logger.Log($"Error loading software descriptions: {e.Message}", rt, Color.Red);
+                Logger.Log($"Error loading software settings: {e.Message}", rt, Color.Red);
             }
 
             return dict;
@@ -690,8 +704,11 @@ namespace USBSoftwareLoader
                     string line;
                     while ((line = sr.ReadLine()) != null)
                     {
-                        string[] parts = line.Split(',');
-                        dict.Add(parts[0], parts[1]);
+                        if (!line.StartsWith(@"#"))   // ignore comment lines
+                        {
+                            string[] parts = line.Split(',');
+                            dict.Add(parts[0], parts[1]);
+                        }
                     }
                 }
             }
@@ -718,6 +735,11 @@ namespace USBSoftwareLoader
             {
                 lblDescription.Text = description;
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(AssemblyDict["231-60295-60"]);
         }
     }
 }
